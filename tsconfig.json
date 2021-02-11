@@ -11,5 +11,8 @@
       "suppressImplicitAnyIndexErrors": true,
       "outDir": "dist"
     },
+    "include": [
+      "src"
+    ],
     "exclude": [ "node_modules" ]
 }
