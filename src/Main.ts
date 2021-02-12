@@ -1,6 +1,6 @@
 import { BrowserWindow, Menu, dialog } from 'electron';
 import * as path from 'path';
-import Editor from './Editor';
+import Editor from './editor';
 
 export default class Main {
     static isMac = process.platform === 'darwin';
@@ -21,24 +21,23 @@ export default class Main {
     private static onReady() {
         Main.mainWindow = new Main.BrowserWindow({
             width: 800,
-            height: 600
+            height: 600,
+            // titleBarStyle: 'hidden',
+            webPreferences: {
+                preload: path.join(__dirname, 'preload')
+            }
         });
+
         Main.mainWindow.loadURL('file://' + path.dirname(__dirname) + '/index.html');
         Main.mainWindow.on('closed', Main.onClose);
     }
 
     private static showOpenDialog(): string[] {
-        const promise = dialog.showOpenDialog(Main.BrowserWindow, {
+        return dialog.showOpenDialogSync(Main.BrowserWindow, {
             properties: [
                 'openFile', 'openDirectory', 'multiSelections'
             ]
         });
-
-        promise.then((value) => {
-            return value.filePaths
-        })
-
-        return [];
     }
 
     private static setupMenus() {
@@ -145,8 +144,8 @@ export default class Main {
                     {
                         label: 'Learn More',
                         click: async () => {
-                        const { shell } = require('electron')
-                        await shell.openExternal('https://electronjs.org')
+                            const { shell } = require('electron')
+                            await shell.openExternal('https://electronjs.org')
                         }
                     }
                 ]
@@ -161,6 +160,7 @@ export default class Main {
         Main.BrowserWindow = browserWindow;
         Main.application = app;
         Main.setupMenus();
+
         Main.application.on('window-all-closed', Main.onWindowAllClosed);
         Main.application.on('ready', Main.onReady);
     }

@@ -2,7 +2,7 @@
   "name": "electronedit",
   "version": "1.0.0",
   "description": "Template for a text editor.",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",

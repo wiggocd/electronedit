@@ -9,7 +9,7 @@ html,body {
 .editor {
     width: inherit;
     height: inherit;
-    margin: 1px;
+    margin: 4px;
 }
 
 .editor:focus {
