@@ -1,6 +1,6 @@
 ElectronEdit
 
-Template for an TypeScript/Electron-based text editor.
+A TypeScript/Electron-based text editor.
 
 # Setup
 
@@ -18,6 +18,6 @@ Template for an TypeScript/Electron-based text editor.
 
 `npm run-script make`
 
-# Cleanup for tsc
+# Cleanup
 
 `npm run-script clean`

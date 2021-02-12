@@ -74,6 +74,9 @@ export default class Main {
                         type: 'normal',
                         accelerator: 'CommandOrControl+S',
                         click() {
+                            if (!Editor.path) {
+                                Editor.path = dialog.showSaveDialogSync(Main.mainWindow);
+                            }
                             Editor.save();
                         }
                     },
