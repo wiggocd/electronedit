@@ -10,11 +10,11 @@ export class File {
     }
 
     open() {
-        fs.readFile(this.path, 'utf8', (err, data) => {
-            if (err) throw err;
-            this.text = data.toString();
+        if (this.path) {
+            const text = fs.readFileSync(this.path, 'utf8');
+            this.text = text;
             this.isOpen = true;
-        });
+        }
     }
 
     write() {

@@ -15,8 +15,8 @@ export default class Editor {
         if (paths && paths.length > 0) {
             const first = paths[0];
             if (path.extname(first)) {
-                this.file = new File(first);
-                this.file.open();
+                Editor.file = new File(first);
+                Editor.file.open();
                 Main.mainWindow.webContents.send('main', new AppEvent('editorUpdate', Editor.file));
             }
         }
