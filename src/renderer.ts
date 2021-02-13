@@ -1,6 +1,9 @@
 import { ipcRenderer } from 'electron';
 import { AppEvent } from './events';
-import { File } from './files'
+import { File } from './files';
+import * as text from './text';
+
+var documentCreated = false;
 
 const ipcMethods = {
     'editorUpdate': updateEditor,
@@ -17,9 +20,34 @@ ipcRenderer.on('main', (event, args) => {
     }
 });
 
+document.addEventListener('readystatechange', () => {
+    if (!documentCreated) {
+        addListeners();
+    }
+});
+
+function addListeners() {
+    const $: JQueryStatic = require('jquery');
+    const mainEditor = document.getElementById('mainEditor');
+    const tab = '&emsp;';
+
+    $('#mainEditor').on('keydown', (event) => {
+        if (event.key == 'Enter') {
+            document.execCommand('insertHTML', false, '<br></br>');
+            return false;
+        } else if (event.key == 'Tab') {
+            document.execCommand('insertHTML', false, tab);
+            return false;
+        }
+    });
+
+    documentCreated = true;
+}
+
 function updateEditor(file: File) {
     var el = document.getElementById('mainEditor');
     el.innerText = file.text;
+    el.innerHTML = text.formatText(el.innerHTML);
 
     el = document.getElementById('navigationBar');
     el.innerText = file.path;
