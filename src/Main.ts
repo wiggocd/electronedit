@@ -1,6 +1,7 @@
 import { BrowserWindow, Menu, dialog } from 'electron';
-import * as path from 'path';
+import { File } from './files';
 import Editor from './editor';
+import * as path from 'path';
 
 export default class Main {
     static isMac = process.platform === 'darwin';
@@ -24,7 +25,8 @@ export default class Main {
             height: 600,
             // titleBarStyle: 'hidden',
             webPreferences: {
-                preload: path.join(__dirname, 'preload')
+                preload: path.join(__dirname, 'preload'),
+                contextIsolation: true
             }
         });
 
@@ -74,13 +76,23 @@ export default class Main {
                         type: 'normal',
                         accelerator: 'CommandOrControl+S',
                         click() {
-                            if (!Editor.path) {
-                                Editor.path = dialog.showSaveDialogSync(Main.mainWindow);
+                            if (!Editor.file.path) {
+                                Editor.setPath(dialog.showSaveDialogSync(Main.mainWindow));
                             }
                             Editor.save();
                         }
                     },
-                    Main.isMac ? { role: 'close' } : { role: 'quit' }
+                    {
+                        label: 'Close',
+                        type: 'normal',
+                        accelerator: 'CommandOrControl+Shift+Esc',
+                        click() {
+                            if (Editor.file) {
+                                Editor.close()
+                            }
+                        }
+                    },
+                    { role: 'quit' }
                 ]
             },
             // { role: 'editMenu' }

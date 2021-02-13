@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc --build",
-    "clean": "tsc --build --clean",
+    "clean": "tsc --build --clean; del-cli --force dist; del-cli --force out",
     "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make"
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@types/node": "^14.14.25",
+    "del-cli": "^3.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "typescript": "^4.1.5"
   },

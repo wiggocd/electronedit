@@ -1,8 +1,9 @@
 html,body {
-    background-color: white;
+    background-color: #ffffff;
     color: black;
     width: 100%;
     height: 100%;
+    font-family: 'SF Mono', 'Meslo LGS', 'Courier', 'Courier New', 'monospace';
     margin: 0;
     overflow: hidden;
     scroll-behavior: unset;
@@ -18,4 +19,12 @@ html,body {
 
 .editor:focus {
     outline: inherit;
+}
+
+.topBar {
+    background-color: rgb(37, 37, 37);
+    color: lightgray;
+    width: inherit;
+    height: fit-content;
+    padding: 2px;
 }

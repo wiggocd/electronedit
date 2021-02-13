@@ -8,16 +8,16 @@ A TypeScript/Electron-based text editor.
 
 # Running
 
-`npm run-script build`
+`npm run build`
 
 `npm start`
 
 # Building for Distribution
 
-`npm run-script build`
+`npm run build`
 
-`npm run-script make`
+`npm run make`
 
 # Cleanup
 
-`npm run-script clean`
+`npm run clean`
