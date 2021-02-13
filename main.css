@@ -7,15 +7,15 @@ html,body {
     font-size: small;
     margin: 0;
     overflow: hidden;
-    scroll-behavior: unset;
 }
 
 .editor {
     width: inherit;
     height: inherit;
     margin: 4px;
-    cursor: text;
     overflow: scroll;
+    display: block;
+    position: fixed;
 }
 
 .editor:focus {
