@@ -7,7 +7,7 @@ import * as path from 'path';
 export default class Editor {
     static file = new File();
 
-    static threadInitialized() {
+    static mainThreadInitialized() {
         ipcMain.on('editorWriteReturn', (_event, args) => {
             Editor.writeFile(args);
         });

@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { AppEvent } from './events';
 import { File } from './files';
 import Main from './main';
@@ -22,7 +22,7 @@ const keyMethods = {
     'Backspace': processBackspace
 };
 
-ipcRenderer.on('main', (event, args) => {
+ipcRenderer.on('main', (_event, args) => {
     if (args) {
         const eventObject: AppEvent = args;
         if (ipcMethods[eventObject.eventName]) {
@@ -40,10 +40,6 @@ document.addEventListener('readystatechange', () => {
     documentCreated = true;
 });
 
-window.onbeforeunload = (_event) => {
-    if ( electronWindow ) electronWindow.removeAllListeners();
-}
-
 function addListeners() {
     $('#mainEditor').on('keydown', (event) => {
         if (keyMethods[event.key]) {
@@ -60,7 +56,7 @@ function setStyles() {
 }
 
 function windowCreated(_data: any) {
-    electronWindow = Main.mainWindow;
+    electronWindow = remote.getCurrentWindow();
     handleWindowControls();
 }
 

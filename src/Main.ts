@@ -9,6 +9,7 @@ export default class Main {
     static mainWindow: Electron.BrowserWindow;
     static application: Electron.App;
     static BrowserWindow;
+    static windowCreated = false;
 
     static windowParams: any = {
         width: 800,
@@ -21,6 +22,7 @@ export default class Main {
             preload: path.join(__dirname, 'preload'),
             nodeIntegration: true,
             contextIsolation: true,
+            enableRemoteModule: true,
             hidden: true
         }
     }
@@ -44,10 +46,17 @@ export default class Main {
         Main.mainWindow.hide();
         Main.mainWindow.loadURL('file://' + path.dirname(__dirname) + '/index.html');
         Main.mainWindow.on('closed', Main.onClose);
+        Main.mainWindow.on('ready-to-show', Main.onWindowReadyToShow);
         Main.mainWindow.show();
 
-        Main.mainWindow.webContents.send('main', new AppEvent('windowCreated', null));
-        Editor.threadInitialized();
+        Editor.mainThreadInitialized();
+    }
+
+    private static onWindowReadyToShow() {
+        if (!Main.windowCreated) {
+            Main.mainWindow.webContents.send('main', new AppEvent('windowCreated'));
+            Main.windowCreated = true;
+        }
     }
 
     private static showOpenDialog(): string[] {
