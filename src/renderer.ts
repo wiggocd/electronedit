@@ -3,11 +3,19 @@ import { AppEvent } from './events';
 import { File } from './files';
 
 var documentCreated = false;
+const tab = '    ';
+const tabLength = tab.length;
 
 const ipcMethods = {
     'editorUpdate': updateEditor,
     'editorWrite': editorWrite,
     'editorClose': closeEditor
+};
+
+const keyMethods = {
+    'Enter': insertNewline,
+    'Tab': insertTab,
+    'Backspace': processBackspace
 };
 
 ipcRenderer.on('main', (event, args) => {
@@ -30,16 +38,43 @@ function addListeners() {
     const tab = '&emsp;';
 
     $('#mainEditor').on('keydown', (event) => {
-        if (event.key == 'Enter') {
-            document.execCommand('insertHTML', false, '<br></br>');
-            return false;
-        } else if (event.key == 'Tab') {
-            document.execCommand('insertHTML', false, '    ');
-            return false;
+        if (keyMethods[event.key]) {
+            return keyMethods[event.key]();
         }
     });
 
     documentCreated = true;
+}
+
+function insertNewline(): boolean {
+    document.execCommand('insertHTML', false, '<br></br>');
+    return false;
+}
+
+function insertTab(): boolean {
+    document.execCommand('insertHTML', false, '    ');
+    return false;
+}
+
+function processBackspace(): boolean {
+    var sel = window.getSelection();
+    var tabRange = new Range();
+    tabRange.setStart(sel.anchorNode, sel.anchorOffset - tabLength);
+    tabRange.setEnd(sel.anchorNode, sel.anchorOffset);
+
+    var deleteTab = false;
+    if (tabRange.toString() == tab) {
+        deleteTab = true;
+    }
+
+    if (deleteTab) {
+        sel.removeAllRanges();
+        sel.addRange(tabRange);
+        document.execCommand('delete', false);
+        return false;
+    } else {
+        return true
+    }
 }
 
 function updateEditor(file: File) {
