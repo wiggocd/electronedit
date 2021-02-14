@@ -1,17 +1,49 @@
-html,body {
-    background-color: #ffffff;
-    color: black;
+:root {
+    --header-bg: rgba(37, 37, 37, 0.9);
+    --titlebar-height: 20px;
+    --navbar-height: 20px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+body {
+    background-color: rgba(32, 32, 32);
+    color: lightgray;
     width: 100%;
     height: 100%;
     font-family: 'SF Mono', 'Meslo LGS', 'Courier', 'Courier New', 'monospace';
     font-size: small;
     margin: 0;
+    border: 1px solid rgb(29, 29, 29);
     overflow: hidden;
+}
+
+#titlebar {
+    background-color: var(--header-bg);
+    display: block;
+    position: static;
+    height: var(--titlebar-height);
+    width: inherit;
+    padding: 4px;
+}
+
+#titlebar #drag-region {
+    width: 100%;
+    height: 100%;
+    -webkit-app-region: drag;
+}
+
+#navigationBar {
+    background-color: var(--header-bg);
+    color: lightgray;
+    width: inherit;
+    height: var(--navbar-height);
+    padding: 2px;
+    vertical-align: middle;
 }
 
 .editor {
     width: inherit;
-    height: inherit;
+    height: calc(100% - var(--titlebar-height) - var(--navbar-height));
     margin: 4px;
     overflow: scroll;
     display: inline-block;
@@ -21,12 +53,4 @@ html,body {
 
 .editor:focus {
     outline: inherit;
-}
-
-.topBar {
-    background-color: rgb(37, 37, 37);
-    color: lightgray;
-    width: inherit;
-    height: fit-content;
-    padding: 2px;
 }

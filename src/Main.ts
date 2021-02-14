@@ -23,15 +23,20 @@ export default class Main {
         Main.mainWindow = new Main.BrowserWindow({
             width: 800,
             height: 600,
-            // titleBarStyle: 'hidden',
+            titleBarStyle: 'hidden',
+            vibrancy: 'window',
             webPreferences: {
                 preload: path.join(__dirname, 'preload'),
-                contextIsolation: true
+                nodeIntegration: true,
+                contextIsolation: true,
+                hidden: true
             }
         });
 
+        Main.mainWindow.hide();
         Main.mainWindow.loadURL('file://' + path.dirname(__dirname) + '/index.html');
         Main.mainWindow.on('closed', Main.onClose);
+        Main.mainWindow.show();
     }
 
     private static showOpenDialog(): string[] {

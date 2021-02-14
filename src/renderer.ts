@@ -1,5 +1,4 @@
 import { ipcRenderer } from 'electron';
-import { createNoSubstitutionTemplateLiteral, TupleType } from 'typescript';
 import { AppEvent } from './events';
 import { File } from './files';
 
@@ -36,7 +35,6 @@ document.addEventListener('readystatechange', () => {
 
 function addListeners() {
     const $: JQueryStatic = require('jquery');
-    const tab = '&emsp;';
 
     $('#mainEditor').on('keydown', (event) => {
         if (keyMethods[event.key]) {
