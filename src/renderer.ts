@@ -40,34 +40,51 @@ function addListeners() {
 
     $('#mainEditor').on('keydown', (event) => {
         if (keyMethods[event.key]) {
-            return keyMethods[event.key]();
+            return keyMethods[event.key](event);
         }
     });
 
     documentCreated = true;
 }
 
-function getCaretLine(el: HTMLElement): number {
-    const sel = window.getSelection();
-    console.log(sel);
-    return 0;
+function getCaretIndex(el: HTMLElement): number {
+    var position = 0;
+    const isSupported = typeof window.getSelection !== "undefined";
+    if (isSupported) {
+        const sel = window.getSelection();
+        if (sel.rangeCount != 0) {
+            const range = sel.getRangeAt(0);
+            const preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(el);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            position = preCaretRange.toString().length;
+        }
+    }
+
+    return position;
 }
 
-function processNewline(): boolean {
-    const el = document.getElementById('mainEditor');
-    const lineNumber = getCaretLine(el);
-    console.log(lineNumber);
+function getLineAtCaretInElement(el: HTMLElement): string {
+    const sel = window.getSelection();
+    const caretIndex = getCaretIndex(el);
 
-    const splitByNewline = el.innerText.split('\n\n');
-    const lineData = splitByNewline[lineNumber];
-    const lineLength = lineData.length;
+    const splitLines = el.innerText.substr(caretIndex - sel.anchorOffset, el.innerText.length).split('\n');
+    const lineData = splitLines ? splitLines[0] : '';
+    
+    return lineData;
+}
+
+function processNewline(event: JQuery.KeyDownEvent): boolean {
+    event.preventDefault();
+    const el = document.getElementById('mainEditor');
+    const lineData = getLineAtCaretInElement(el);
 
     var spaceCount = 0;
-    for (var i=0; i<lineLength; i++) {
+    for (var i=0; i<lineData.length; i++) {
         if (lineData[i] == ' ') { spaceCount++; } else break;
     }
 
-    const tabCount = spaceCount / tabLength;
+    const tabCount = Math.floor(spaceCount / tabLength);
     const insertTab = tabCount > 0;
     if (insertTab) {
         for (var i=0; i<tabCount; i++) { document.execCommand('insertLineBreak'); }
@@ -79,12 +96,13 @@ function processNewline(): boolean {
     return false;
 }
 
-function processTab(): boolean {
+function processTab(event: JQuery.KeyDownEvent): boolean {
+    event.preventDefault();
     document.execCommand('insertHTML', false, tab);
     return false;
 }
 
-function processBackspace(): boolean {
+function processBackspace(_event: JQuery.KeyDownEvent): boolean {
     var sel = window.getSelection();
     var tabRange = new Range();
 
