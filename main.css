@@ -14,9 +14,9 @@ html,body {
     height: inherit;
     margin: 4px;
     overflow: scroll;
-    display: block;
+    display: inline-block;
     position: fixed;
-    white-space: pre;
+    white-space: pre-wrap;
 }
 
 .editor:focus {

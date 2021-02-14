@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import { createNoSubstitutionTemplateLiteral, TupleType } from 'typescript';
 import { AppEvent } from './events';
 import { File } from './files';
 
@@ -13,8 +14,8 @@ const ipcMethods = {
 };
 
 const keyMethods = {
-    'Enter': insertNewline,
-    'Tab': insertTab,
+    'Enter': processNewline,
+    'Tab': processTab,
     'Backspace': processBackspace
 };
 
@@ -46,34 +47,60 @@ function addListeners() {
     documentCreated = true;
 }
 
-function insertNewline(): boolean {
-    document.execCommand('insertHTML', false, '<br></br>');
+function getCaretLine(el: HTMLElement): number {
+    const sel = window.getSelection();
+    console.log(sel);
+    return 0;
+}
+
+function processNewline(): boolean {
+    const el = document.getElementById('mainEditor');
+    const lineNumber = getCaretLine(el);
+    console.log(lineNumber);
+
+    const splitByNewline = el.innerText.split('\n\n');
+    const lineData = splitByNewline[lineNumber];
+    const lineLength = lineData.length;
+
+    var spaceCount = 0;
+    for (var i=0; i<lineLength; i++) {
+        if (lineData[i] == ' ') { spaceCount++; } else break;
+    }
+
+    const tabCount = spaceCount / tabLength;
+    const insertTab = tabCount > 0;
+    if (insertTab) {
+        for (var i=0; i<tabCount; i++) { document.execCommand('insertLineBreak'); }
+        document.execCommand('insertHTML', false, tab);
+    } else {
+        document.execCommand('insertLineBreak');
+    }
+
     return false;
 }
 
-function insertTab(): boolean {
-    document.execCommand('insertHTML', false, '    ');
+function processTab(): boolean {
+    document.execCommand('insertHTML', false, tab);
     return false;
 }
 
 function processBackspace(): boolean {
     var sel = window.getSelection();
     var tabRange = new Range();
-    tabRange.setStart(sel.anchorNode, sel.anchorOffset - tabLength);
-    tabRange.setEnd(sel.anchorNode, sel.anchorOffset);
 
-    var deleteTab = false;
-    if (tabRange.toString() == tab) {
-        deleteTab = true;
-    }
+    const endOffset = sel.anchorOffset;
+    const startOffset = endOffset > 0 ? endOffset - tabLength : endOffset;
+    tabRange.setStart(sel.anchorNode, startOffset);
+    tabRange.setEnd(sel.anchorNode, endOffset);
 
+    const deleteTab = tabRange.toString() == tab;
     if (deleteTab) {
         sel.removeAllRanges();
         sel.addRange(tabRange);
         document.execCommand('delete', false);
         return false;
     } else {
-        return true
+        return true;
     }
 }
 
