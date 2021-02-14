@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { AppEvent } from './events';
 import { File } from './files';
-import * as text from './text';
 
 var documentCreated = false;
 
@@ -28,7 +27,6 @@ document.addEventListener('readystatechange', () => {
 
 function addListeners() {
     const $: JQueryStatic = require('jquery');
-    const mainEditor = document.getElementById('mainEditor');
     const tab = '&emsp;';
 
     $('#mainEditor').on('keydown', (event) => {
@@ -36,7 +34,7 @@ function addListeners() {
             document.execCommand('insertHTML', false, '<br></br>');
             return false;
         } else if (event.key == 'Tab') {
-            document.execCommand('insertHTML', false, tab);
+            document.execCommand('insertHTML', false, '    ');
             return false;
         }
     });
@@ -47,7 +45,6 @@ function addListeners() {
 function updateEditor(file: File) {
     var el = document.getElementById('mainEditor');
     el.innerText = file.text;
-    el.innerHTML = text.formatText(el.innerHTML);
 
     el = document.getElementById('navigationBar');
     el.innerText = file.path;

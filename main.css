@@ -16,6 +16,7 @@ html,body {
     overflow: scroll;
     display: block;
     position: fixed;
+    white-space: pre;
 }
 
 .editor:focus {
