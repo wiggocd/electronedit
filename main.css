@@ -2,6 +2,7 @@
     --header-bg: rgba(37, 37, 37, 0.9);
     --titlebar-height: 20px;
     --navbar-height: 20px;
+    --editor-padding: 4px;
     background-color: rgba(0, 0, 0, 0);
 }
 
@@ -12,17 +13,19 @@ body {
     height: 100%;
     font-family: 'SF Mono', 'Meslo LGS', 'Courier', 'Courier New', 'monospace';
     font-size: small;
-    margin: 0;
+    margin: 0px;
+    padding: 0px;
     border: 1px solid rgb(29, 29, 29);
     overflow: hidden;
 }
 
 #titlebar {
     background-color: var(--header-bg);
+    color: white;
     display: block;
-    position: static;
+    position: fixed;
     height: var(--titlebar-height);
-    width: inherit;
+    width: 100%;
     padding: 4px;
 }
 
@@ -30,6 +33,77 @@ body {
     width: 100%;
     height: 100%;
     -webkit-app-region: drag;
+}
+
+#window-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    padding-right: 8px;
+    -webkit-app-region: no-drag;
+}
+
+#window-controls .button {
+    grid-row: 1 / span 1;
+    display: flex;
+    fill: white;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+
+#window-controls .button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#window-controls .button.active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#close-button:hover {
+    background: #E81123 !important;
+}
+#close-button:active .icon {
+    filter: invert(1);
+}
+
+#min-button {
+    grid-column: 1;
+}
+
+#max-button, #restore-button {
+    grid-column: 2;
+}
+
+#restore-button {
+    display: none !important;
+}
+
+.maximised #restore-button {
+    display: flex !important; 
+}
+
+.maximised #max-button {
+    display: none;
+}
+
+#close-button {
+    grid-column: 3;
+}
+
+@media (-webkit-device-pixel-ratio: 1.5), (device-pixel-ratio: 1.5),
+(-webkit-device-pixel-ratio: 1.75), (device-pixel-ratio: 1.75),
+(-webkit-device-pixel-ratio: 2), (device-pixel-ratio: 2),
+(-webkit-device-pixel-ratio: 3), (device-pixel-ratio: 3) {
+    #window-controls .icon {
+        width: 10px;
+        height: 10px;
+    }
 }
 
 #navigationBar {
@@ -42,13 +116,17 @@ body {
 }
 
 .editor {
-    width: inherit;
+    width: calc(100% - calc(var(--editor-padding) * 2));
     height: calc(100% - var(--titlebar-height) - var(--navbar-height));
-    margin: 4px;
-    overflow: scroll;
+    left: 0px;
+    bottom: 0px;
+    padding: var(--editor-padding);
     display: inline-block;
+    overflow-y: scroll;
+    overflow-x: hidden;
     position: fixed;
     white-space: pre-wrap;
+
 }
 
 .editor:focus {

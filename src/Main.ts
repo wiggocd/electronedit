@@ -1,13 +1,29 @@
 import { BrowserWindow, Menu, dialog } from 'electron';
-import { File } from './files';
 import Editor from './editor';
 import * as path from 'path';
+import { AppEvent } from './events';
 
 export default class Main {
     static isMac = process.platform === 'darwin';
+    static isWindows = process.platform == 'win32';
     static mainWindow: Electron.BrowserWindow;
     static application: Electron.App;
     static BrowserWindow;
+
+    static windowParams: any = {
+        width: 800,
+        height: 600,
+        minWidth: 320,
+        minHeight: 240,
+        vibrancy: 'window',
+        backgroundColor: '#000000',
+        webPreferences: {
+            preload: path.join(__dirname, 'preload'),
+            nodeIntegration: true,
+            contextIsolation: true,
+            hidden: true
+        }
+    }
 
     private static onWindowAllClosed() {
         if (Main.isMac) {
@@ -20,26 +36,18 @@ export default class Main {
     }
 
     private static onReady() {
-        Main.mainWindow = new Main.BrowserWindow({
-            width: 800,
-            height: 600,
-            minWidth: 320,
-            minHeight: 240,
-            titleBarStyle: 'hidden',
-            vibrancy: 'window',
-            backgroundColor: '#000000',
-            webPreferences: {
-                preload: path.join(__dirname, 'preload'),
-                nodeIntegration: true,
-                contextIsolation: true,
-                hidden: true
-            }
-        });
+        if (Main.isMac) Main.windowParams.titleBarStyle = 'hidden';
+        else if (Main.isWindows) Main.windowParams.frame = false;
+
+        Main.mainWindow = new Main.BrowserWindow(Main.windowParams);
 
         Main.mainWindow.hide();
         Main.mainWindow.loadURL('file://' + path.dirname(__dirname) + '/index.html');
         Main.mainWindow.on('closed', Main.onClose);
         Main.mainWindow.show();
+
+        Main.mainWindow.webContents.send('main', new AppEvent('windowCreated'));
+        Editor.threadInitialized();
     }
 
     private static showOpenDialog(): string[] {
@@ -66,7 +74,7 @@ export default class Main {
                     { type: 'separator' },
                     { role: 'quit' }
                 ]
-            } : {},
+            } : { role: 'appMenu' },
             // { role: 'fileMenu' }
             {
                 label: 'File',

@@ -1,12 +1,16 @@
 import { ipcRenderer } from 'electron';
 import { AppEvent } from './events';
 import { File } from './files';
+import Main from './main';
 
-var documentCreated = false;
+var $: JQueryStatic;
+var electronWindow: Electron.BrowserWindow;
 const tab = '    ';
 const tabLength = tab.length;
+var documentCreated = false;
 
 const ipcMethods = {
+    'windowCreated': windowCreated,
     'editorUpdate': updateEditor,
     'editorWrite': editorWrite,
     'editorClose': closeEditor
@@ -19,6 +23,7 @@ const keyMethods = {
 };
 
 ipcRenderer.on('main', (event, args) => {
+    console.log(event);
     if (args) {
         const eventObject: AppEvent = args;
         if (ipcMethods[eventObject.eventName]) {
@@ -29,20 +34,64 @@ ipcRenderer.on('main', (event, args) => {
 
 document.addEventListener('readystatechange', () => {
     if (!documentCreated) {
+        $ = require('jquery');
         addListeners();
     }
+    setStyles();
+    documentCreated = true;
 });
 
-function addListeners() {
-    const $: JQueryStatic = require('jquery');
+window.onbeforeunload = (_event) => {
+    if ( electronWindow ) electronWindow.removeAllListeners();
+}
 
+function addListeners() {
     $('#mainEditor').on('keydown', (event) => {
         if (keyMethods[event.key]) {
             return keyMethods[event.key](event);
         }
     });
+}
 
-    documentCreated = true;
+function setStyles() {
+    if (!Main.isMac) {
+        $('#window-controls').show();
+    }
+}
+
+function windowCreated(_data: any) {
+    electronWindow = Main.mainWindow;
+    handleWindowControls();
+}
+
+function handleWindowControls() {
+    $('#min-button').on('click', (_event) => {
+        electronWindow.minimize();
+    });
+
+    $('#max-button').on('click', (_event) => {
+        electronWindow.maximize();
+    });
+    
+    $('#restore-button').on('click', (_event) => {
+        electronWindow.unmaximize();
+    });
+
+    $('#close-button').on('click', (_event) => {
+        electronWindow.close();
+    });
+
+    toggleMaxRestoreButtons();
+    electronWindow.on('maximize', toggleMaxRestoreButtons);
+    electronWindow.on('unmaximize', toggleMaxRestoreButtons);
+
+    function toggleMaxRestoreButtons() {
+        if (electronWindow.isMaximized()) {
+            document.body.classList.add('maximised');
+        } else {
+            document.body.classList.remove('maximised');
+        }
+    }
 }
 
 function getCaretIndex(el: HTMLElement): number {

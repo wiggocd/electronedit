@@ -4,12 +4,14 @@ import { ipcMain } from 'electron';
 import Main from './main';
 import * as path from 'path';
 
-ipcMain.on('editorWriteReturn', (_event, args) => {
-    Editor.writeFile(args);
-});
-
 export default class Editor {
     static file = new File();
+
+    static threadInitialized() {
+        ipcMain.on('editorWriteReturn', (_event, args) => {
+            Editor.writeFile(args);
+        });
+    }
 
     static open(paths: string[]) {
         if (paths && paths.length > 0) {

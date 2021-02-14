@@ -1,11 +1,11 @@
 {
   "name": "electronedit",
   "version": "1.0.0",
-  "description": "Template for a text editor.",
+  "description": "A TypeScript/Electron-based text editor.",
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc --build",
-    "clean": "tsc --build --clean; del-cli --force dist; del-cli --force out",
+    "clean": "del-cli --force dist; del-cli --force out",
     "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make"
