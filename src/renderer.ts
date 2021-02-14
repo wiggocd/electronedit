@@ -22,7 +22,7 @@ const keyMethods = {
     'Backspace': processBackspace
 };
 
-ipcRenderer.on('main', (_event, args) => {
+ipcRenderer.on('main', (event, args) => {
     if (args) {
         const eventObject: AppEvent = args;
         if (ipcMethods[eventObject.eventName]) {
@@ -53,8 +53,9 @@ function addListeners() {
 }
 
 function setStyles() {
-    if (!Main.isMac) {
-        $('#window-controls').hide();
+    if (Main.isWindows) {
+        const controls = document.getElementById('window-controls');
+        controls.hidden = false;
     }
 }
 

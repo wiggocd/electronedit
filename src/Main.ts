@@ -46,7 +46,7 @@ export default class Main {
         Main.mainWindow.on('closed', Main.onClose);
         Main.mainWindow.show();
 
-        Main.mainWindow.webContents.send('main', new AppEvent('windowCreated'));
+        Main.mainWindow.webContents.send('main', new AppEvent('windowCreated', null));
         Editor.threadInitialized();
     }
 
