@@ -23,8 +23,11 @@ export default class Main {
         Main.mainWindow = new Main.BrowserWindow({
             width: 800,
             height: 600,
+            minWidth: 320,
+            minHeight: 240,
             titleBarStyle: 'hidden',
             vibrancy: 'window',
+            backgroundColor: '#000000',
             webPreferences: {
                 preload: path.join(__dirname, 'preload'),
                 nodeIntegration: true,
