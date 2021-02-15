@@ -53,4 +53,13 @@ export default class Editor {
             }
         }
     }
+
+    static newFile(path: string) {
+        if (path) {
+            Editor.setPath(path);
+            Editor.file.isOpen = true;
+            Editor.file.text = '';
+            Main.mainWindow.webContents.send('main', new AppEvent('editorUpdate', Editor.file));
+        }
+    }
 }

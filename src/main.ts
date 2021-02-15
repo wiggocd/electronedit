@@ -83,7 +83,7 @@ export default class Main {
             );
             finalMenuTemplate.push(appMenu);
         }
-        
+
         menuTemplate.forEach((value) => {
             finalMenuTemplate.push(value);
         });
@@ -115,6 +115,16 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
         label: 'File',
         submenu: [
+            {
+                label: 'New File',
+                type: 'normal',
+                accelerator: 'CommandOrControl+N',
+                click() {
+                    if (!Editor.file.path) {
+                        Editor.newFile(dialog.showSaveDialogSync(Main.mainWindow));
+                    }
+                }
+            },
             {
                 label: 'Open',
                 type: 'normal',
