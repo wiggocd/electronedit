@@ -118,7 +118,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
             {
                 label: 'New File',
                 type: 'normal',
-                accelerator: 'CommandOrControl+N',
+                accelerator: 'CmdOrCtrl+N',
                 click() {
                     if (!Editor.file.path) {
                         Editor.newFile(dialog.showSaveDialogSync(Main.mainWindow));
@@ -128,7 +128,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
             {
                 label: 'Open',
                 type: 'normal',
-                accelerator: 'CommandOrControl+O',
+                accelerator: 'CmdOrCtrl+O',
                 click() {
                     Editor.open(Main.showOpenDialog());
                 }
@@ -136,7 +136,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
             {
                 label: 'Save',
                 type: 'normal',
-                accelerator: 'CommandOrControl+S',
+                accelerator: 'CmdOrCtrl+S',
                 click() {
                     if (!Editor.file.path) {
                         Editor.setPath(dialog.showSaveDialogSync(Main.mainWindow));
@@ -147,14 +147,17 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
             {
                 label: 'Close',
                 type: 'normal',
-                accelerator: 'CommandOrControl+W',
+                accelerator: 'CmdOrCtrl+W',
                 click() {
                     if (Editor.file) {
                         Editor.close()
                     }
                 }
             },
-            { role: 'quit' }
+            {
+                role: 'quit',
+                accelerator: 'CmdOrCtrl+Q'
+            }
         ]
     },
     // { role: 'editMenu' }
@@ -171,7 +174,11 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
             { type: 'separator' },
             { role: 'selectAll' }
         ] : [
-            { role: 'pasteAndMatchStyle' },
+            {
+                label: 'Paste',
+                role: 'pasteAndMatchStyle',
+                accelerator: 'CmdOrCtrl+V'
+            },
             { role: 'delete' },
             { role: 'selectAll' },
             { type: 'separator' },
