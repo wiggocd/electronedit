@@ -13,8 +13,10 @@ function createTitlebar() {
         overflow: 'hidden'
     });
 
+    const originalTitle = document.title;
     document.title = '';
     titlebar.updateTitle();
+    document.title = originalTitle;
 
     const closeButton = $('.window-close')[0];
     closeButton.addEventListener('click', (_event) => {
