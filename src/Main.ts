@@ -110,7 +110,7 @@ export default class Main {
                     {
                         label: 'Close',
                         type: 'normal',
-                        accelerator: 'CommandOrControl+Shift+Esc',
+                        accelerator: 'CommandOrControl+W',
                         click() {
                             if (Editor.file) {
                                 Editor.close()

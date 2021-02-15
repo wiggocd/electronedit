@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron';
+import Editor from './editor';
 import { AppEvent } from './events';
 import { File } from './files';
 import Main from './main';
@@ -12,6 +13,7 @@ var documentCreated = false;
 const ipcMethods = {
     'windowCreated': windowCreated,
     'editorUpdate': updateEditor,
+    'editorPathUpdate': updateEditorPath,
     'editorWrite': editorWrite,
     'editorClose': closeEditor
 };
@@ -120,6 +122,7 @@ function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
     const el = document.getElementById('mainEditor');
     const lineData = getLineAtCaretInElement(el);
+    console.log('\"'+lineData+'\"');
 
     var spaceCount = 0;
     for (var i=0; i<lineData.length; i++) {
@@ -167,10 +170,14 @@ function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 function updateEditor(file: File) {
     var el = document.getElementById('mainEditor');
     el.innerText = file.text;
+    el.innerHTML = el.innerHTML.replace('<br>', '\n');
 
-    el = document.getElementById('navigationBar');
+    updateEditorPath(file);
+}
+
+function updateEditorPath(file: File) {
+    var el = document.getElementById('navigationBar');
     el.innerText = file.path;
-    el.hidden = false;
 }
 
 function editorWrite(_file: File) {
@@ -184,5 +191,4 @@ function closeEditor(_file: File) {
 
     el = document.getElementById('navigationBar');
     el.innerText = '';
-    el.hidden = true;
 }

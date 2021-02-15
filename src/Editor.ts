@@ -35,7 +35,7 @@ export default class Editor {
             Editor.file.text = text;
             Editor.file.isOpen = true;
             Editor.file.write();
-            Main.mainWindow.webContents.send('main', new AppEvent('editorUpdate', Editor.file));
+            Main.mainWindow.webContents.send('main', new AppEvent('editorPathUpdate', Editor.file));
         }
     }
 
@@ -47,6 +47,8 @@ export default class Editor {
     static setPath(path: string) {
         if (Editor.file) {
             Editor.file.path = path;
+        } else {
+            Editor.file = new File(path);
         }
         console.log(Editor.file);
     }
