@@ -83,6 +83,7 @@ export default class Main {
             );
             finalMenuTemplate.push(appMenu);
         }
+        
         menuTemplate.forEach((value) => {
             finalMenuTemplate.push(value);
         });

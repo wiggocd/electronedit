@@ -1,5 +1,5 @@
 :root {
-    --mac-titlebar-height: 32px;
+    --mac-titlebar-height: 20px;
     --header-bg: rgba(46, 46, 46, 0.9);
     --navbar-height: 12px;
     overflow: hidden;
@@ -21,9 +21,20 @@ body {
 
 #titlebar {
     background-color: var(--header-bg);
+    background-image: linear-gradient(rgb(54, 54, 54), var(--header-bg));
     width: 100%;
     height: var(--mac-titlebar-height);
+    top: 0px;
+    padding: 4px;
+    user-select: none;
     -webkit-app-region: drag;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin-right: 8px;
 }
 
 #navigationbar {
