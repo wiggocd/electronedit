@@ -1,18 +1,15 @@
 import { ipcRenderer, remote } from 'electron';
 import { AppEvent } from './events';
 import { File } from './files';
-import { Titlebar, Color } from 'custom-electron-titlebar';
 import Main from './main';
 import $ from 'jquery';
 
-var currentWindow: Electron.BrowserWindow;
+export var currentWindow: Electron.BrowserWindow;
 const tab = '    ';
 const tabLength = tab.length;
-const iconRelativeToRoot = 'resources/icon.png';
 
 if (!Main.windowCreated) {
     addListeners();
-    setStyles();
     createTitlebar();
 }
 
@@ -47,23 +44,13 @@ function addListeners() {
     });
 }
 
-function setStyles() {
-    if (!Main.isWindows) {
-        $('#window-controls')[0].style.display = 'none';
-    }
-}
-
 function createTitlebar() {
-    new Titlebar({
-        backgroundColor: Color.fromHex('#2e2e2e'),
-        icon: iconRelativeToRoot,
-        overflow: 'hidden'
-    });
-
-    $('.window-icon.window-close')[0].addEventListener('click', (_event) => {
-        console.log('Close');
-        currentWindow.close();
-    });
+    if (Main.isMac) {
+        $('#titlebar').show();
+        $('#main-editor')[0].style.height = 'calc(100% - var(--navbar-height) - var(--editor-padding) - var(--mac-titlebar-height) * 2)';
+    } else {
+        require('./customtitlebar');
+    }
 }
 
 function windowCreated(_data: any) {

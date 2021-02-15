@@ -62,9 +62,33 @@ export default class Main {
     }
 
     private static setupMenus() {
-        if (Main.isMac) menuTemplate.push(appMenu);
-        const menu = Menu.buildFromTemplate(menuTemplate)
-        Menu.setApplicationMenu(menu)
+        var finalMenuTemplate: Electron.MenuItemConstructorOptions[] = [];
+        if (Main.isMac) {
+            appMenu = (
+                // { role: 'appMenu' }
+                {
+                    label: Main.application.name,
+                    submenu: [
+                        { role: 'about' },
+                        { type: 'separator' },
+                        { role: 'services' },
+                        { type: 'separator' },
+                        { role: 'hide' },
+                        { role: 'hideOthers' },
+                        { role: 'unhide' },
+                        { type: 'separator' },
+                        { role: 'quit' }
+                    ]
+                }
+            );
+            finalMenuTemplate.push(appMenu);
+        }
+        menuTemplate.forEach((value) => {
+            finalMenuTemplate.push(value);
+        });
+
+        const menu = Menu.buildFromTemplate(finalMenuTemplate);
+        Menu.setApplicationMenu(menu);
     }
 
     static showOpenDialog(): string[] {
@@ -83,26 +107,6 @@ export default class Main {
         Main.application.on('window-all-closed', Main.onWindowAllClosed);
         Main.application.on('ready', Main.onReady);
     }
-}
-
-if (Main.isMac) {
-    appMenu = (
-        // { role: 'appMenu' }
-        {
-            label: Main.application.name,
-            submenu: [
-                { role: 'about' },
-                { type: 'separator' },
-                { role: 'services' },
-                { type: 'separator' },
-                { role: 'hide' },
-                { role: 'hideOthers' },
-                { role: 'unhide' },
-                { type: 'separator' },
-                { role: 'quit' }
-            ]
-        }
-    );
 }
 
 const menuTemplate: Electron.MenuItemConstructorOptions[] = [
