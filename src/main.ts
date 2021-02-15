@@ -1,7 +1,9 @@
 import { BrowserWindow, Menu, dialog } from 'electron';
+import { AppEvent } from './events';
 import Editor from './editor';
 import * as path from 'path';
-import { AppEvent } from './events';
+
+var appMenu: Electron.MenuItemConstructorOptions;
 
 export default class Main {
     static isMac = process.platform === 'darwin';
@@ -18,6 +20,8 @@ export default class Main {
         minHeight: 240,
         vibrancy: 'window',
         backgroundColor: '#000000',
+        frame: false,
+        titleBarStyle: 'hidden',
         webPreferences: {
             preload: path.join(__dirname, 'preload'),
             nodeIntegration: true,
@@ -34,13 +38,11 @@ export default class Main {
     }
 
     private static onClose() {
-        Main.mainWindow = null
+        Main.mainWindow = null;
+        Main.windowCreated = false;
     }
 
     private static onReady() {
-        if (Main.isMac) Main.windowParams.titleBarStyle = 'hidden';
-        else if (Main.isWindows) Main.windowParams.frame = false;
-
         Main.mainWindow = new Main.BrowserWindow(Main.windowParams);
 
         Main.mainWindow.hide();
@@ -59,141 +61,18 @@ export default class Main {
         }
     }
 
-    private static showOpenDialog(): string[] {
+    private static setupMenus() {
+        if (Main.isMac) menuTemplate.push(appMenu);
+        const menu = Menu.buildFromTemplate(menuTemplate)
+        Menu.setApplicationMenu(menu)
+    }
+
+    static showOpenDialog(): string[] {
         return dialog.showOpenDialogSync(Main.BrowserWindow, {
             properties: [
                 'openFile', 'openDirectory', 'multiSelections'
             ]
         });
-    }
-
-    private static setupMenus() {
-        const menuTemplate: Electron.MenuItemConstructorOptions[] = [
-            // { role: 'appMenu' }
-            Main.isMac ? {
-                label: Main.application.name,
-                submenu: [
-                    { role: 'about' },
-                    { type: 'separator' },
-                    { role: 'services' },
-                    { type: 'separator' },
-                    { role: 'hide' },
-                    { role: 'hideOthers' },
-                    { role: 'unhide' },
-                    { type: 'separator' },
-                    { role: 'quit' }
-                ]
-            } : { role: 'appMenu' },
-            // { role: 'fileMenu' }
-            {
-                label: 'File',
-                submenu: [
-                    {
-                        label: 'Open',
-                        type: 'normal',
-                        accelerator: 'CommandOrControl+O',
-                        click() {
-                            Editor.open(Main.showOpenDialog());
-                        }
-                    },
-                    {
-                        label: 'Save',
-                        type: 'normal',
-                        accelerator: 'CommandOrControl+S',
-                        click() {
-                            if (!Editor.file.path) {
-                                Editor.setPath(dialog.showSaveDialogSync(Main.mainWindow));
-                            }
-                            Editor.save();
-                        }
-                    },
-                    {
-                        label: 'Close',
-                        type: 'normal',
-                        accelerator: 'CommandOrControl+W',
-                        click() {
-                            if (Editor.file) {
-                                Editor.close()
-                            }
-                        }
-                    },
-                    { role: 'quit' }
-                ]
-            },
-            // { role: 'editMenu' }
-            {
-                label: 'Edit',
-                submenu: Main.isMac ? [
-                    { role: 'undo' },
-                    { role: 'redo' },
-                    { type: 'separator' },
-                    { role: 'cut' },
-                    { role: 'copy' },
-                    { role: 'paste' },
-                    { role: 'delete' },
-                    { type: 'separator' },
-                    { role: 'selectAll' }
-                ] : [
-                    { role: 'pasteAndMatchStyle' },
-                    { role: 'delete' },
-                    { role: 'selectAll' },
-                    { type: 'separator' },
-                    {
-                        label: 'Speech',
-                        submenu: [
-                            { role: 'startSpeaking' },
-                            { role: 'stopSpeaking' }
-                        ]
-                    }
-                ]
-            },
-            // { role: 'viewMenu' }
-            {
-                label: 'View',
-                submenu: [
-                    { role: 'reload' },
-                    { role: 'forceReload' },
-                    { role: 'toggleDevTools' },
-                    { type: 'separator' },
-                    { role: 'resetZoom' },
-                    { role: 'zoomIn' },
-                    { role: 'zoomOut' },
-                    { type: 'separator' },
-                    { role: 'togglefullscreen' }
-                ]
-            },
-            // { role: 'windowMenu' }
-            {
-                label: 'Window',
-                submenu: Main.isMac ? [
-                    { role: 'minimize' },
-                    { role: 'zoom' },
-                    { role: 'close' }
-                ] : [
-                    { role: 'minimize' },
-                    { role: 'zoom' },
-                    { type: 'separator' },
-                    { role: 'front' },
-                    { type: 'separator' },
-                    { role: 'window' }
-                ]
-            },
-            {
-                role: 'help',
-                submenu: [
-                    {
-                        label: 'Learn More',
-                        click: async () => {
-                            const { shell } = require('electron')
-                            await shell.openExternal('https://electronjs.org')
-                        }
-                    }
-                ]
-            }
-        ]
-
-        const menu = Menu.buildFromTemplate(menuTemplate)
-        Menu.setApplicationMenu(menu)
     }
 
     static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
@@ -205,3 +84,132 @@ export default class Main {
         Main.application.on('ready', Main.onReady);
     }
 }
+
+if (Main.isMac) {
+    appMenu = (
+        // { role: 'appMenu' }
+        {
+            label: Main.application.name,
+            submenu: [
+                { role: 'about' },
+                { type: 'separator' },
+                { role: 'services' },
+                { type: 'separator' },
+                { role: 'hide' },
+                { role: 'hideOthers' },
+                { role: 'unhide' },
+                { type: 'separator' },
+                { role: 'quit' }
+            ]
+        }
+    );
+}
+
+const menuTemplate: Electron.MenuItemConstructorOptions[] = [
+    // { role: 'fileMenu' }
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Open',
+                type: 'normal',
+                accelerator: 'CommandOrControl+O',
+                click() {
+                    Editor.open(Main.showOpenDialog());
+                }
+            },
+            {
+                label: 'Save',
+                type: 'normal',
+                accelerator: 'CommandOrControl+S',
+                click() {
+                    if (!Editor.file.path) {
+                        Editor.setPath(dialog.showSaveDialogSync(Main.mainWindow));
+                    }
+                    Editor.save();
+                }
+            },
+            {
+                label: 'Close',
+                type: 'normal',
+                accelerator: 'CommandOrControl+W',
+                click() {
+                    if (Editor.file) {
+                        Editor.close()
+                    }
+                }
+            },
+            { role: 'quit' }
+        ]
+    },
+    // { role: 'editMenu' }
+    {
+        label: 'Edit',
+        submenu: Main.isMac ? [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            { role: 'delete' },
+            { type: 'separator' },
+            { role: 'selectAll' }
+        ] : [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+                label: 'Speech',
+                submenu: [
+                    { role: 'startSpeaking' },
+                    { role: 'stopSpeaking' }
+                ]
+            }
+        ]
+    },
+    // { role: 'viewMenu' }
+    {
+        label: 'View',
+        submenu: [
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+            { type: 'separator' },
+            { role: 'resetZoom' },
+            { role: 'zoomIn' },
+            { role: 'zoomOut' },
+            { type: 'separator' },
+            { role: 'togglefullscreen' }
+        ]
+    },
+    // { role: 'windowMenu' }
+    {
+        label: 'Window',
+        submenu: Main.isMac ? [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            { role: 'close' }
+        ] : [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
+        ]
+    },
+    {
+        role: 'help',
+        submenu: [
+            {
+                label: 'Learn More',
+                click: async () => {
+                    const { shell } = require('electron')
+                    await shell.openExternal('https://electronjs.org')
+                }
+            }
+        ]
+    }
+]

@@ -1,13 +1,20 @@
 import { ipcRenderer, remote } from 'electron';
 import { AppEvent } from './events';
 import { File } from './files';
+import { Titlebar, Color } from 'custom-electron-titlebar';
 import Main from './main';
+import $ from 'jquery';
 
-var $: JQueryStatic;
-var electronWindow: Electron.BrowserWindow;
+var currentWindow: Electron.BrowserWindow;
 const tab = '    ';
 const tabLength = tab.length;
-var documentCreated = false;
+const iconRelativeToRoot = 'resources/icon.png';
+
+if (!Main.windowCreated) {
+    addListeners();
+    setStyles();
+    createTitlebar();
+}
 
 const ipcMethods = {
     'windowCreated': windowCreated,
@@ -32,17 +39,8 @@ ipcRenderer.on('main', (_event, args) => {
     }
 });
 
-document.addEventListener('readystatechange', () => {
-    if (!documentCreated) {
-        $ = require('jquery');
-        addListeners();
-        setStyles();
-    }
-    documentCreated = true;
-});
-
 function addListeners() {
-    $('#mainEditor').on('keydown', (event) => {
+    $('#main-editor').on('keydown', (event) => {
         if (keyMethods[event.key]) {
             return keyMethods[event.key](event);
         }
@@ -55,44 +53,26 @@ function setStyles() {
     }
 }
 
-function windowCreated(_data: any) {
-    electronWindow = remote.getCurrentWindow();
-    handleWindowControls();
+function createTitlebar() {
+    new Titlebar({
+        backgroundColor: Color.fromHex('#2e2e2e'),
+        icon: iconRelativeToRoot,
+        overflow: 'hidden'
+    });
+
+    $('.window-icon.window-close')[0].addEventListener('click', (_event) => {
+        console.log('Close');
+        currentWindow.close();
+    });
 }
 
-function handleWindowControls() {
-    $('#min-button').on('click', (_event) => {
-        electronWindow.minimize();
-    });
-
-    $('#max-button').on('click', (_event) => {
-        electronWindow.maximize();
-    });
-    
-    $('#restore-button').on('click', (_event) => {
-        electronWindow.unmaximize();
-    });
-
-    $('#close-button').on('click', (_event) => {
-        electronWindow.close();
-    });
-
-    toggleMaxRestoreButtons();
-    electronWindow.on('maximize', toggleMaxRestoreButtons);
-    electronWindow.on('unmaximize', toggleMaxRestoreButtons);
-
-    function toggleMaxRestoreButtons() {
-        if (electronWindow.isMaximized()) {
-            document.body.classList.add('maximised');
-        } else {
-            document.body.classList.remove('maximised');
-        }
-    }
+function windowCreated(_data: any) {
+    currentWindow = remote.getCurrentWindow();
 }
 
 function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
-    const el = document.getElementById('mainEditor');
+    const el = document.getElementById('main-editor');
     const sel = window.getSelection();
 
     var range = new Range();
@@ -148,26 +128,24 @@ function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 }
 
 function updateEditor(file: File) {
-    var el = document.getElementById('mainEditor');
+    var el = document.getElementById('main-editor');
     el.innerText = file.text;
 
     updateEditorPath(file);
 }
 
 function updateEditorPath(file: File) {
-    var el = document.getElementById('navigationBar');
-    el.innerText = file.path;
+    $('#navigationbar').children()[0].innerText = file.path;
 }
 
 function editorWrite(_file: File) {
-    const el = document.getElementById('mainEditor');
+    const el = document.getElementById('main-editor');
     ipcRenderer.send('editorWriteReturn', el.innerText);
 }
 
 function closeEditor(_file: File) {
-    var el = document.getElementById('mainEditor');
+    var el = document.getElementById('main-editor');
     el.innerText = '';
 
-    el = document.getElementById('navigationBar');
-    el.innerText = '';
+    $('#navigationbar').children()[0].innerText = '';
 }
