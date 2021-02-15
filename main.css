@@ -1,7 +1,9 @@
 :root {
     --header-bg: rgba(37, 37, 37, 0.9);
-    --titlebar-height: 20px;
+    --titlebar-height: 24px;
+    --titlebar-padding: 4px;
     --navbar-height: 20px;
+    --navbar-padding: 2px;
     --editor-padding: 4px;
     background-color: rgba(0, 0, 0, 0);
 }
@@ -11,13 +13,23 @@ body {
     color: lightgray;
     width: 100%;
     height: 100%;
-    font-family: 'SF Mono', 'Meslo LGS', 'Courier', 'Courier New', 'monospace';
+    font-family: 'SF Mono', 'Meslo LGS', 'Consolas', 'Courier', 'Courier New', 'monospace';
     font-size: small;
     margin: 0px;
     padding: 0px;
     border: 1px solid rgb(29, 29, 29);
     overflow: hidden;
 }
+
+#inner {
+    --top: calc(var(--titlebar-height) + var(--titlebar-padding) * 2);
+    position: absolute;
+    top: var(--top);
+    width: 100%;
+    height: calc(100% - var(--top));
+}
+
+/* **************** */
 
 #titlebar {
     background-color: var(--header-bg);
@@ -26,7 +38,7 @@ body {
     position: fixed;
     height: var(--titlebar-height);
     width: 100%;
-    padding: 4px;
+    padding: var(--titlebar-padding);
 }
 
 #titlebar #drag-region {
@@ -68,6 +80,7 @@ body {
 #close-button:hover {
     background: #E81123 !important;
 }
+
 #close-button:active .icon {
     filter: invert(1);
 }
@@ -99,6 +112,9 @@ body {
 @media (-webkit-device-pixel-ratio: 1.5), (device-pixel-ratio: 1.5),
 (-webkit-device-pixel-ratio: 1.75), (device-pixel-ratio: 1.75),
 (-webkit-device-pixel-ratio: 2), (device-pixel-ratio: 2),
+(-webkit-device-pixel-ratio: 2.25), (device-pixel-ratio: 2.25),
+(-webkit-device-pixel-ratio: 2.5), (device-pixel-ratio: 2.5),
+(-webkit-device-pixel-ratio: 2.75), (device-pixel-ratio: 2.75),
 (-webkit-device-pixel-ratio: 3), (device-pixel-ratio: 3) {
     #window-controls .icon {
         width: 10px;
@@ -106,27 +122,23 @@ body {
     }
 }
 
+/* **************** */
+
 #navigationBar {
     background-color: var(--header-bg);
     color: lightgray;
     width: inherit;
     height: var(--navbar-height);
-    padding: 2px;
-    vertical-align: middle;
+    padding: var(--navbar-padding);
 }
 
-.editor {
+#mainEditor {
     width: calc(100% - calc(var(--editor-padding) * 2));
-    height: calc(100% - var(--titlebar-height) - var(--navbar-height));
-    left: 0px;
-    bottom: 0px;
+    height: inherit;
     padding: var(--editor-padding);
-    display: inline-block;
     overflow-y: scroll;
     overflow-x: hidden;
-    position: fixed;
     white-space: pre-wrap;
-
 }
 
 .editor:focus {
