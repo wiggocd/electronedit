@@ -45,11 +45,12 @@ export default class Editor {
     }
 
     static setPath(path: string) {
-        if (Editor.file) {
-            Editor.file.path = path;
-        } else {
-            Editor.file = new File(path);
+        if (path) {
+            if (Editor.file) {
+                Editor.file.path = path;
+            } else {
+                Editor.file = new File(path);
+            }
         }
-        console.log(Editor.file);
     }
 }

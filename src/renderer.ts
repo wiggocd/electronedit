@@ -1,5 +1,4 @@
 import { ipcRenderer, remote } from 'electron';
-import Editor from './editor';
 import { AppEvent } from './events';
 import { File } from './files';
 import Main from './main';
@@ -91,49 +90,30 @@ function handleWindowControls() {
     }
 }
 
-function getCaretIndex(el: HTMLElement): number {
-    var position = 0;
-    const isSupported = typeof window.getSelection !== "undefined";
-    if (isSupported) {
-        const sel = window.getSelection();
-        if (sel.rangeCount != 0) {
-            const range = sel.getRangeAt(0);
-            const preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(el);
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            position = preCaretRange.toString().length;
-        }
-    }
-
-    return position;
-}
-
-function getLineAtCaretInElement(el: HTMLElement): string {
-    const sel = window.getSelection();
-    const caretIndex = getCaretIndex(el);
-
-    const splitLines = el.innerText.substr(caretIndex - sel.anchorOffset, el.innerText.length).split('\n');
-    const lineData = splitLines ? splitLines[0] : '';
-    
-    return lineData;
-}
-
 function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
     const el = document.getElementById('mainEditor');
-    const lineData = getLineAtCaretInElement(el);
-    console.log('\"'+lineData+'\"');
+    const sel = window.getSelection();
+
+    var range = new Range();
+    range.setStart(sel.anchorNode, 0);
+    range.setEnd(sel.anchorNode, sel.anchorOffset);
+
+    const rangeString = range.toString();
+    const rangeSplit = rangeString.split('\n');
+    const lineData = rangeSplit ? rangeSplit[rangeSplit.length-1] : rangeString;
 
     var spaceCount = 0;
     for (var i=0; i<lineData.length; i++) {
         if (lineData[i] == ' ') { spaceCount++; } else break;
     }
 
+    console.log(spaceCount);
     const tabCount = Math.floor(spaceCount / tabLength);
     const insertTab = tabCount > 0;
     if (insertTab) {
-        for (var i=0; i<tabCount; i++) { document.execCommand('insertLineBreak'); }
-        document.execCommand('insertHTML', false, tab);
+        document.execCommand('insertLineBreak');
+        for (var i=0; i<tabCount; i++) { document.execCommand('insertHTML', false, tab); }
     } else {
         document.execCommand('insertLineBreak');
     }
@@ -170,7 +150,6 @@ function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 function updateEditor(file: File) {
     var el = document.getElementById('mainEditor');
     el.innerText = file.text;
-    el.innerHTML = el.innerHTML.replace('<br>', '\n');
 
     updateEditorPath(file);
 }
