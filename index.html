@@ -7,12 +7,19 @@
         <title>ElectronEdit</title>
     </head>
     <body>
-        <header class="bar" id="titlebar" hidden="true">
+        <header id="titlebar" hidden="true">
             <img class="icon" src="resources/icon.png">
         </header>
-        <header class="bar" id="navigationbar">
+        <header id="navigationbar" hidden="true">
             <span class="vertical-center"></span>
         </header>
-        <div class="editor" id="main-editor" contenteditable="true" spellcheck="false"></div>
+        <div class="editor" id="editor-welcome">
+            <div class="box">
+                <img class="icon-large" src="resources/icon.png">
+                <h1>Welcome to ElectronEdit</h1>
+                <h2>Go to File > New or Open to start editing.</h2>
+            </div>
+        </div>
+        <div class="editor" id="main-editor" contenteditable="true" spellcheck="false" hidden="true"></div>
     </body>
 </html>

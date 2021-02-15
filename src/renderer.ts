@@ -47,7 +47,9 @@ function addListeners() {
 function createTitlebar() {
     if (Main.isMac) {
         $('#titlebar').show();
-        $('#main-editor')[0].style.height = 'calc(100% - var(--navbar-height) - var(--editor-padding) - var(--mac-titlebar-height) * 2)';
+        $('.editor').each((_index, el) => {
+            el.style.height = 'calc(100% - var(--navbar-height) - var(--editor-padding) - var(--mac-titlebar-height) * 2)';
+        });
     } else {
         require('./customtitlebar');
     }
@@ -115,24 +117,27 @@ function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 }
 
 function updateEditor(file: File) {
-    var el = document.getElementById('main-editor');
-    el.innerText = file.text;
-
+    $('#main-editor')[0].innerText = file.text;
+    $('#main-editor').show();
+    $('#editor-welcome').hide();
     updateEditorPath(file);
 }
 
 function updateEditorPath(file: File) {
     $('#navigationbar').children()[0].innerText = file.path;
+    $('#navigationbar').show();
 }
 
 function editorWrite(_file: File) {
-    const el = document.getElementById('main-editor');
+    const el = $('#main-editor')[0];
     ipcRenderer.send('editorWriteReturn', el.innerText);
 }
 
 function closeEditor(_file: File) {
-    var el = document.getElementById('main-editor');
-    el.innerText = '';
-
+    $('#main-editor')[0].innerText = '';
     $('#navigationbar').children()[0].innerText = '';
+
+    $('#main-editor').hide();
+    $('#navigationbar').hide();
+    $('#editor-welcome').show();
 }
