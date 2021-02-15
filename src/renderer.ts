@@ -35,8 +35,8 @@ document.addEventListener('readystatechange', () => {
     if (!documentCreated) {
         $ = require('jquery');
         addListeners();
+        setStyles();
     }
-    setStyles();
     documentCreated = true;
 });
 
@@ -49,9 +49,8 @@ function addListeners() {
 }
 
 function setStyles() {
-    if (Main.isWindows) {
-        const controls = document.getElementById('window-controls');
-        controls.hidden = false;
+    if (!Main.isWindows) {
+        $('#window-controls')[0].style.display = 'none';
     }
 }
 
