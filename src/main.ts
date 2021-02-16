@@ -18,7 +18,6 @@ export default class Main {
         height: 600,
         minWidth: 320,
         minHeight: 240,
-        vibrancy: 'window',
         backgroundColor: '#000000',
         frame: false,
         titleBarStyle: 'hidden',
