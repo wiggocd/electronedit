@@ -92,31 +92,18 @@ function processNewline(event: JQuery.KeyDownEvent): boolean {
 
 function processTab(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
-    const lastSel = window.getSelection();
+    const sel = window.getSelection();
 
-    if (lastSel.anchorNode != lastSel.focusNode || lastSel.anchorOffset != lastSel.focusOffset) {
+    // Todo: proess outdents and multiline tabbing
+
+    if (sel.anchorNode != sel.focusNode || sel.anchorOffset != sel.focusOffset) {
         if (event.shiftKey) {
-            document.execCommand('outdent', false);
+            
         } else {
-            document.execCommand('indent', false);
+            
         }
     } else if (event.shiftKey) {
-        var sel = window.getSelection();
-        sel.removeAllRanges();
         
-        var range = new Range();
-        range.setStart(lastSel.anchorNode, lastSel.anchorOffset);
-        lastSel.anchorNode == lastSel.focusNode || lastSel.anchorOffset == lastSel.focusOffset ?
-            range.setEnd(lastSel.focusNode, (lastSel.focusOffset == (lastSel.focusNode as any).length - 1 ? lastSel.focusOffset - 1 : lastSel.focusOffset + 1))
-            : range.setEnd(lastSel.anchorNode, lastSel.anchorOffset);
-        sel.addRange(range);
-
-        document.execCommand('outdent', false);
-
-        sel.removeAllRanges();
-        for (var i=0; i<lastSel.rangeCount; i++) {
-            sel.addRange(lastSel.getRangeAt(i));
-        }
     } else {
         document.execCommand('insertHTML', false, tab);
     }
