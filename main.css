@@ -59,6 +59,16 @@ h2 {
     padding-top: 2px;
     padding-left: 8px;
     box-shadow: none 4px 0.8 1 black;
+    overflow: show;
+}
+
+.menubar-menu-container {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+}
+
+ul.submenu.menubar-menu-container {
+    float: right !important;
 }
 
 #main-editor {
