@@ -41,15 +41,67 @@ export function processTab(event: JQuery.KeyDownEvent): boolean {
     const sel = window.getSelection();
 
     // Todo: proess outdents and multiline tabbing
-    if (sel.anchorNode != sel.focusNode || sel.anchorOffset != sel.focusOffset) {
+    if (sel.anchorNode != sel.focusNode) {
         if (event.shiftKey) {
-            
+
         } else {
-            
+            const anchor = sel.anchorNode as any;
+            var range = new Range();
+            range.setStart(sel.anchorNode, 0);
+            range.setEnd(sel.anchorNode, anchor.length);
+            const line = range.toString();
+
+            var firstLineWhitespace = '';
+            for (var i=0; i<line.length; i++) {
+                if (line[i] == ' ') { firstLineWhitespace += ' '; } else break;
+            }
+
+            const lineRange = sel.getRangeAt(0);
+            const lines = lineRange.toString().split(firstLineWhitespace);
+            const whitespaceLength = firstLineWhitespace.length;
+
+            const parent = sel.anchorNode.parentNode;
+            const childNodes = parent.childNodes;
+            var anchorIndex: number;
+            var focusIndex: number;
+
+            childNodes.forEach((value, i, _parent) => {
+                if (value == sel.anchorNode) {
+                    anchorIndex = i;
+                } else if (value == sel.focusNode) {
+                    focusIndex = i;
+                }
+            });
+
+            if (anchorIndex || focusIndex) {
+                const nodeStartIndex = anchorIndex > focusIndex ? focusIndex : anchorIndex;
+
+                var lastRanges: Range[] = [];
+                for (var j=0; j<sel.rangeCount; j++) {
+                    lastRanges.push(sel.getRangeAt(j));
+                }
+
+                // 2 nodes per line for line breaks
+                for (var i=nodeStartIndex; i<nodeStartIndex+lines.length*2; i+=2) {
+                    const node = childNodes[i] as any;
+                    const offset = whitespaceLength < node.length ? whitespaceLength : 0;
+                    var range = new Range();
+                    range.setStart(node, offset);
+                    range.setEnd(node, offset);
+
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    insertTab();
+                }
+
+                sel.removeAllRanges();
+                console.log(lastRanges);
+                lastRanges.forEach((value, _i, _arr) => {
+                    sel.addRange(value);
+                });
+            }
         }
     } else if (event.shiftKey) {
-        console.log('Outdent');
-
         const anchor = sel.anchorNode as any;
         var range = new Range();
         range.setStart(sel.anchorNode, 0);
@@ -78,10 +130,14 @@ export function processTab(event: JQuery.KeyDownEvent): boolean {
             sel.addRange(lastRange);
         }
     } else {
-        document.execCommand('insertHTML', false, tab);
+        insertTab();
     }
 
     return false;
+}
+
+export function insertTab() {
+    document.execCommand('insertHTML', false, tab);
 }
 
 export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
