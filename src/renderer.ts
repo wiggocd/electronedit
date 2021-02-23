@@ -132,7 +132,7 @@ function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 }
 
 function updateEditor(file: File) {
-    $('#main-editor')[0].innerText = file.text;
+    $('.inner', '#main-editor')[0].innerText = file.text;
     $('#main-editor').show();
     $('#editor-welcome').hide();
     updateEditorPath(file);
@@ -144,12 +144,12 @@ function updateEditorPath(file: File) {
 }
 
 function editorWrite(_file: File) {
-    const el = $('#main-editor')[0];
+    const el = $('.inner', '#main-editor')[0];
     ipcRenderer.send('editorWriteReturn', el.innerText);
 }
 
 function closeEditor(_file: File) {
-    $('#main-editor')[0].innerText = '';
+    $('.inner', '#main-editor')[0].innerText = '';
     $('#navigationbar').children()[0].innerText = '';
 
     $('#main-editor').hide();
