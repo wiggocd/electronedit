@@ -4,6 +4,7 @@ import $ from 'jquery';
 
 const tab = '    ';
 const tabLength = tab.length;
+var lastNewlineCount = 0;
 
 export function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
@@ -33,6 +34,13 @@ export function processNewline(event: JQuery.KeyDownEvent): boolean {
         document.execCommand('insertLineBreak');
     }
 
+    if ($('.margin', '#main-editor')[0].innerText.split('\n').length < lastNewlineCount) {
+        addLineToMargin();
+    } else {
+        updateMargin();
+    }
+
+    lastNewlineCount = $('.margin', '#main-editor')[0].innerText.split('\n').length;
     return false;
 }
 
@@ -107,6 +115,7 @@ export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
         document.execCommand('delete', false);
         return false;
     } else {
+        updateMargin();
         return true;
     }
 }
@@ -115,7 +124,24 @@ export function update(file: File) {
     $('.inner', '#main-editor')[0].innerText = file.text;
     $('#main-editor').show();
     $('#editor-welcome').hide();
+    updateMargin();
     updatePath(file);
+}
+
+function updateMargin() {
+    var lines = '';
+    const editorText = $('.inner', '#main-editor')[0].innerText;
+    const split = editorText.split('\n');
+    for (var i=1; i<split.length; i++) {
+        lines += i + '\n';
+    }
+
+    $('.margin', '#main-editor')[0].innerText = lines;
+}
+
+function addLineToMargin() {
+    const editorText = $('.inner', '#main-editor')[0].innerText;
+    $('.margin', '#main-editor')[0].innerText += editorText.split('\n').length + '\n';
 }
 
 export function updatePath(file: File) {
