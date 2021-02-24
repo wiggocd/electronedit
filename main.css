@@ -115,7 +115,7 @@ ul.submenu.menubar-menu-container {
 }
 
 #main-editor .inner {
-    width: auto;
+    width: 80%;
     height: auto;
     float: left;
     font-family: var(--font-family-mono);

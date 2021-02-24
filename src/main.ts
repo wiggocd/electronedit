@@ -119,7 +119,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
                 type: 'normal',
                 accelerator: 'CmdOrCtrl+N',
                 click() {
-                    if (!Editor.file.path) {
+                    if (!Editor.file || !Editor.file.path) {
                         Editor.newFile(dialog.showSaveDialogSync(Main.mainWindow));
                     }
                 }
