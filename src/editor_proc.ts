@@ -39,12 +39,66 @@ export function processTab(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
     const sel = window.getSelection();
 
-    // Todo: add  multiline tab handling
+    // Todo: complete multiline tab handling
     if (sel.anchorNode != sel.focusNode) {
         if (event.shiftKey) {
-            
+            const el = sel.anchorNode.parentElement;
+            var pastAnchorNode = false;
+            var pastFocusNode = false;
+            var firstNode: Node;
+            el.childNodes.forEach((node, _i, _nodeList) => {
+                if (!pastAnchorNode && node == sel.anchorNode) {
+                    pastAnchorNode = true;
+                    if (!firstNode) {
+                        firstNode = sel.anchorNode;
+                    }
+                }
+                
+                if (!pastFocusNode && node == sel.focusNode) {
+                    pastFocusNode = true;
+                    if (!firstNode) {
+                        firstNode = sel.focusNode;
+                    }
+                }
+
+                if (firstNode) {
+                    if ((firstNode == sel.anchorNode && !pastFocusNode)
+                    || (firstNode == sel.focusNode && !pastAnchorNode)) {
+                        node.textContent = node.textContent.substr(tabLength, node.textContent.length);
+                    } else {
+                        return;
+                    }
+                }
+            });
         } else {
-            
+            const el = sel.anchorNode.parentElement;
+            var pastAnchorNode = false;
+            var pastFocusNode = false;
+            var firstNode: Node;
+            el.childNodes.forEach((node, _i, _nodeList) => {
+                if (!pastAnchorNode && node == sel.anchorNode) {
+                    pastAnchorNode = true;
+                    if (!firstNode) {
+                        firstNode = sel.anchorNode;
+                    }
+                }
+                
+                if (!pastFocusNode && node == sel.focusNode) {
+                    pastFocusNode = true;
+                    if (!firstNode) {
+                        firstNode = sel.focusNode;
+                    }
+                }
+
+                if (firstNode) {
+                    if ((firstNode == sel.anchorNode && !pastFocusNode)
+                    || (firstNode == sel.focusNode && !pastAnchorNode)) {
+                        node.textContent = tab + node.textContent;
+                    } else {
+                        return;
+                    }
+                }
+            });
         }
     } else if (event.shiftKey) {
         outdent();
@@ -101,9 +155,9 @@ export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 
     const deleteTab = tabRange.toString() == tab;
     if (deleteTab) {
-        sel.removeAllRanges();
-        sel.addRange(tabRange);
-        document.execCommand('delete', false);
+        for (var i=0; i<4; i++) {
+            document.execCommand('delete', false);
+        } 
     } else {
         document.execCommand('delete', false);
     }
