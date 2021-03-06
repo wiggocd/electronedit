@@ -36,9 +36,19 @@ ipcRenderer.on('main', (_event, args) => {
 
 function addListeners() {
     $('#main-editor').on('keydown', (event) => {
+        var ret = true;
         if (keyMethods[event.key]) {
-            return keyMethods[event.key](event);
+            ret = keyMethods[event.key](event);
         }
+
+        EditorProcesses.updateMargin();
+        return ret;
+    });
+
+    $('#main-editor').on('cut paste', (_event) => {
+        setTimeout(function() {
+            EditorProcesses.updateMargin();
+        }, 0);
     });
 }
 

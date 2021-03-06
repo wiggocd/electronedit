@@ -119,7 +119,7 @@ ul.submenu.menubar-menu-container {
     height: auto;
     float: left;
     font-family: var(--font-family-mono);
-    white-space: pre-wrap;
+    white-space: pre;
     cursor: text;
     padding-bottom: 100px;
 }
