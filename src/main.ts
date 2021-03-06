@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, dialog } from 'electron';
+import { BrowserWindow, Menu, dialog, Accelerator } from 'electron';
 import { AppEvent } from './events';
 import Editor from './editor';
 import * as path from 'path';
@@ -163,8 +163,22 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
         label: 'Edit',
         submenu: Main.isMac ? [
-            { role: 'undo' },
-            { role: 'redo' },
+            {
+                label: 'Undo',
+                type: 'normal',
+                accelerator: 'CmdOrCtrl+Z',
+                click() {
+                    Main.mainWindow.webContents.send('main', new AppEvent('undo', null));
+                }
+            },
+            {
+                label: 'Redo',
+                type: 'normal',
+                accelerator: 'CmdOrCtrl+Shift+Z',
+                click() {
+                    Main.mainWindow.webContents.send('main', new AppEvent('redo', null));
+                }
+            },
             { type: 'separator' },
             { role: 'cut' },
             { role: 'copy' },

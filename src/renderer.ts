@@ -16,7 +16,9 @@ const ipcMethods = {
     'editorUpdate': EditorProcesses.update,
     'editorPathUpdate': EditorProcesses.updatePath,
     'editorWrite': EditorProcesses.write,
-    'editorClose': EditorProcesses.close
+    'editorClose': EditorProcesses.close,
+    'undo': undo,
+    'redo': redo
 };
 
 const keyMethods = {
@@ -39,6 +41,8 @@ function addListeners() {
         var ret = true;
         if (keyMethods[event.key]) {
             ret = keyMethods[event.key](event);
+        } else if (event.metaKey && event.key == 'z') {
+            updateWithTimeout();
         }
 
         EditorProcesses.updateMargin();
@@ -46,10 +50,24 @@ function addListeners() {
     });
 
     $('#main-editor').on('cut paste', (_event) => {
-        setTimeout(function() {
-            EditorProcesses.updateMargin();
-        }, 0);
+        updateWithTimeout();
     });
+}
+
+function undo() {
+    document.execCommand('undo');
+    updateWithTimeout();
+}
+
+function redo() {
+    document.execCommand('redo');
+    updateWithTimeout();
+}
+
+function updateWithTimeout() {
+    setTimeout(function() {
+        EditorProcesses.updateMargin();
+    }, 0);
 }
 
 function createTitlebar() {

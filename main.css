@@ -121,7 +121,7 @@ ul.submenu.menubar-menu-container {
     font-family: var(--font-family-mono);
     white-space: pre;
     cursor: text;
-    padding-bottom: 100px;
+    padding-bottom: 100%;
 }
 
 #editor-welcome {
