@@ -86,43 +86,71 @@ function outdent() {
     }
 }
 
-function tabMultiline(outdent: boolean) {
+function tabMultiline(outdent: boolean = false) {
     const sel = window.getSelection();
+    const anchorOffset = sel.anchorOffset;
+    const focusOffset = sel.focusOffset;
+    const lastRanges: Range[] = [];
+    for (var i=0; i<sel.rangeCount; i++) { lastRanges.push(sel.getRangeAt(i)) }
+
     const el = sel.anchorNode.parentElement;
-    var pastAnchorNode = false;
-    var pastFocusNode = false;
-    var firstNode: Node;
-    for (var i=0; i< el.childNodes.length; i++) {
-        const node = el.childNodes[i];
-        if (!pastAnchorNode && !firstNode && node == sel.anchorNode) {
-            firstNode = sel.anchorNode;
-        }
-        
-        if (!pastFocusNode && !firstNode && node == sel.focusNode) {
-            firstNode = sel.focusNode;
-        }
+    var nodes: Node[] = [];
+    el.childNodes.forEach((node, _i, _list) => {
+        nodes.push(node);
+    });
 
-        if (firstNode) {
-            if ((firstNode == sel.anchorNode && !pastFocusNode)
-            || (firstNode == sel.focusNode && !pastAnchorNode)) {
-                if (outdent) {
-                    node.textContent = node.textContent.substr(tabLength, node.textContent.length);
-                } else {
-                    node.textContent = tab + node.textContent;
-                }
-            } else {
-                break;
+    const anchorIndex = nodes.indexOf(sel.anchorNode);
+    const focusIndex = nodes.indexOf(sel.focusNode);
+    var selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
+                        : nodes.slice(focusIndex, anchorIndex + 1);
+    var outdented = false;
+    selectedNodes.forEach((node, _i, _arr) => {
+        if (outdent) {
+            const anchor = node as any;
+            var range = new Range();
+            range.setStart(anchor, 0);
+            range.setEnd(anchor, anchor.length);
+            const line = range.toString();
+
+            var spaceCount = 0;
+            for (var j=0; j<line.length; j++) {
+                if (line[j] == ' ') { spaceCount++; } else break;
             }
-        }
 
-        if (!pastAnchorNode && node == sel.anchorNode) {
-            pastAnchorNode = true;
+            const tabCount = Math.floor(spaceCount / tabLength);
+            if (tabCount > 0) {
+                node.textContent = node.textContent.substr(tabLength, node.textContent.length);
+            }
+            
+            outdented = true;
+        } else {
+            node.textContent = tab + node.textContent;
         }
-        
-        if (!pastFocusNode && node == sel.focusNode) {
-            pastFocusNode = true;
+    });
+
+    var firstRange = new Range();
+    if (focusIndex > anchorIndex) {
+        firstRange.setStart(sel.anchorNode, sel.anchorOffset);
+        if (outdent && outdented) {
+            firstRange.setEnd(sel.focusNode, focusOffset - tabLength);
+        } else if (!outdent) {
+            firstRange.setEnd(sel.focusNode, focusOffset + tabLength);
+        }
+    } else {
+        firstRange.setStart(sel.focusNode, sel.focusOffset);
+        if (outdent && outdented) {
+            firstRange.setEnd(sel.anchorNode, anchorOffset - tabLength);
+        } else if (!outdent) {
+            firstRange.setEnd(sel.anchorNode, anchorOffset + tabLength);
         }
     }
+    
+    sel.removeAllRanges();
+    lastRanges.forEach((range, _i, _arr) => {
+        sel.addRange(range);
+    });
+    sel.removeRange(sel.getRangeAt(0));
+    sel.addRange(firstRange);
 }
 
 export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
