@@ -93,14 +93,17 @@ function tabMultiline(outdent: boolean = false) {
     const lastRanges: Range[] = [];
     for (var i=0; i<sel.rangeCount; i++) { lastRanges.push(sel.getRangeAt(i)) }
 
-    const el = sel.anchorNode.parentElement;
+    const el = $('#main-editor .inner')[0];
     var nodes: Node[] = [];
     el.childNodes.forEach((node, _i, _list) => {
         nodes.push(node);
     });
 
-    const anchorIndex = nodes.indexOf(sel.anchorNode);
-    const focusIndex = nodes.indexOf(sel.focusNode);
+    const anchorNode = sel.anchorNode;
+    const focusNode = sel.focusNode;
+
+    const anchorIndex = nodes.indexOf(anchorNode);
+    const focusIndex = nodes.indexOf(focusNode);
     var selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
                         : nodes.slice(focusIndex, anchorIndex + 1);
     if (selectedNodes.length > 1) {
@@ -130,18 +133,18 @@ function tabMultiline(outdent: boolean = false) {
 
         var firstRange = new Range();
         if (focusIndex > anchorIndex) {
-            firstRange.setStart(sel.anchorNode, sel.anchorOffset);
+            firstRange.setStart(anchorNode, sel.anchorOffset);
             if (outdent && outdented) {
-                firstRange.setEnd(sel.focusNode, focusOffset - tabLength);
+                firstRange.setEnd(focusNode, focusOffset - tabLength);
             } else if (!outdent) {
-                firstRange.setEnd(sel.focusNode, focusOffset + tabLength);
+                firstRange.setEnd(focusNode, focusOffset + tabLength);
             }
         } else {
-            firstRange.setStart(sel.focusNode, sel.focusOffset);
+            firstRange.setStart(focusNode, sel.focusOffset);
             if (outdent && outdented) {
-                firstRange.setEnd(sel.anchorNode, anchorOffset - tabLength);
+                firstRange.setEnd(anchorNode, anchorOffset - tabLength);
             } else if (!outdent) {
-                firstRange.setEnd(sel.anchorNode, anchorOffset + tabLength);
+                firstRange.setEnd(anchorNode, anchorOffset + tabLength);
             }
         }
 
@@ -179,6 +182,7 @@ export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
 
 export function update(file: File) {
     $('.inner', '#main-editor')[0].innerText = file.text;
+    $('#tabbar').show();
     $('#main-editor').show();
     $('#editor-welcome').hide();
     updateMargin();
@@ -199,6 +203,7 @@ export function updateMargin() {
 export function updatePath(file: File) {
     $('#navigationbar').children()[0].innerText = file.path;
     $('#navigationbar').show();
+    $('#active-tab').children()[0].innerText = file.name;
 }
 
 export function write(_file: File) {
@@ -209,8 +214,10 @@ export function write(_file: File) {
 export function close(_file: File) {
     $('.inner', '#main-editor')[0].innerText = '';
     $('#navigationbar').children()[0].innerText = '';
+    $('#active-tab').children()[0].innerText = '';
 
     $('#main-editor').hide();
+    $('#tabbar').hide();
     $('#navigationbar').hide();
     $('#editor-welcome').show();
 }
