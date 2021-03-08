@@ -5,9 +5,22 @@ import $ from 'jquery';
 const tab = '    ';
 const tabLength = tab.length;
 
+export function selectionChanged() {
+    const sel = window.getSelection();
+    if (sel.anchorNode != sel.focusNode) {
+        const inner = $('.inner', '#main-editor')[0];
+        if (sel.anchorNode == inner) {
+            /* Todo: ammend selection by newlines from offset */
+        }
+
+        if (sel.focusNode == inner) {
+            
+        }
+    }
+}
+
 export function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
-    const el = document.getElementById('main-editor');
     const sel = window.getSelection();
 
     var range = new Range();
@@ -99,11 +112,8 @@ function tabMultiline(outdent: boolean = false) {
         nodes.push(node);
     });
 
-    const anchorNode = sel.anchorNode;
-    const focusNode = sel.focusNode;
-
-    const anchorIndex = nodes.indexOf(anchorNode);
-    const focusIndex = nodes.indexOf(focusNode);
+    const anchorIndex = nodes.indexOf(sel.anchorNode);
+    const focusIndex = nodes.indexOf(sel.focusNode);
     var selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
                         : nodes.slice(focusIndex, anchorIndex + 1);
     if (selectedNodes.length > 1) {
@@ -133,18 +143,18 @@ function tabMultiline(outdent: boolean = false) {
 
         var firstRange = new Range();
         if (focusIndex > anchorIndex) {
-            firstRange.setStart(anchorNode, sel.anchorOffset);
+            firstRange.setStart(sel.anchorNode, sel.anchorOffset);
             if (outdent && outdented) {
-                firstRange.setEnd(focusNode, focusOffset - tabLength);
+                firstRange.setEnd(sel.focusNode, focusOffset - tabLength);
             } else if (!outdent) {
-                firstRange.setEnd(focusNode, focusOffset + tabLength);
+                firstRange.setEnd(sel.focusNode, focusOffset + tabLength);
             }
         } else {
-            firstRange.setStart(focusNode, sel.focusOffset);
+            firstRange.setStart(sel.focusNode, sel.focusOffset);
             if (outdent && outdented) {
-                firstRange.setEnd(anchorNode, anchorOffset - tabLength);
+                firstRange.setEnd(sel.anchorNode, anchorOffset - tabLength);
             } else if (!outdent) {
-                firstRange.setEnd(anchorNode, anchorOffset + tabLength);
+                firstRange.setEnd(sel.anchorNode, anchorOffset + tabLength);
             }
         }
 

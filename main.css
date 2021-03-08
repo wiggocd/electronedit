@@ -76,23 +76,19 @@ h2 {
     font-size: 11px;
     width: 100%;
     height: 25px;
-    box-shadow: none 4px 0.8 1 black;
     overflow: show;
     cursor: default;
-    padding-left: var(--navbar-lateral-padding);
 }
 
 .tab {
     width: 60px;
     cursor: pointer;
-    padding: 4px;
+    padding: var(--navbar-lateral-padding);
+    box-shadow: none 4px 0.8 1 black;
 }
 
 #active-tab {
     color: lightgray;
-    background-color: rgba(65, 65, 65, 0.85);
-    border: 0px solid transparent;
-    border-radius: 4px;
 }
 
 #navigationbar {
@@ -147,7 +143,7 @@ ul.submenu.menubar-menu-container {
     font-family: var(--font-family-mono);
     white-space: pre;
     cursor: text;
-    padding-bottom: 100%;
+    padding-bottom: 50%;
 }
 
 #editor-welcome {
