@@ -6,17 +6,32 @@ const tab = '    ';
 const tabLength = tab.length;
 
 export function selectionChanged() {
-    const sel = window.getSelection();
-    if (sel.anchorNode != sel.focusNode) {
-        const inner = $('.inner', '#main-editor')[0];
-        if (sel.anchorNode == inner) {
-            /* Todo: ammend selection by newlines from offset */
-        }
-
-        if (sel.focusNode == inner) {
-            
-        }
-    }
+    /* Todo: ammend broken selections by accounting for newlines from node offset */
+    // const sel = window.getSelection();
+    // const inner = $('.inner', '#main-editor')[0];
+    // if (sel.anchorNode != sel.focusNode && (
+    //     sel.anchorNode == inner || sel.focusNode == inner)) {
+    //     const anchorFirst = sel.focusOffset > sel.anchorOffset;
+    //     const previousLines = Math.floor((anchorFirst ? sel.anchorOffset : sel.focusOffset) / 2);
+    //     var nodes: Node[] = [];
+    //     inner.childNodes.forEach((node, _i, _list) => {
+    //         nodes.push(node);
+    //     });
+        
+    //     const node = nodes[previousLines];
+    //     const nodeLength = node.textContent.length;
+    //     var range = new Range();
+    //     if (anchorFirst) {
+    //         range.setStart(sel.anchorNode, sel.anchorOffset);
+    //         range.setEnd(node, nodeLength > 0 ? nodeLength - 1: nodeLength);
+    //     } else {
+    //         range.setStart(node, nodeLength > 0 ? nodeLength - 1: nodeLength);
+    //         range.setEnd(sel.focusNode, sel.focusOffset);
+    //     }
+    //     console.log(range);
+    //     sel.removeAllRanges();
+    //     sel.addRange(range);
+    // }
 }
 
 export function processNewline(event: JQuery.KeyDownEvent): boolean {
@@ -106,7 +121,7 @@ function tabMultiline(outdent: boolean = false) {
     const lastRanges: Range[] = [];
     for (var i=0; i<sel.rangeCount; i++) { lastRanges.push(sel.getRangeAt(i)) }
 
-    const el = $('#main-editor .inner')[0];
+    const el = $('.inner', '#main-editor')[0];
     var nodes: Node[] = [];
     el.childNodes.forEach((node, _i, _list) => {
         nodes.push(node);
