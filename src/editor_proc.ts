@@ -5,35 +5,6 @@ import $ from 'jquery';
 const tab = '    ';
 const tabLength = tab.length;
 
-export function selectionChanged() {
-    /* Todo: ammend broken selections by accounting for newlines from node offset */
-    // const sel = window.getSelection();
-    // const inner = $('.inner', '#main-editor')[0];
-    // if (sel.anchorNode != sel.focusNode && (
-    //     sel.anchorNode == inner || sel.focusNode == inner)) {
-    //     const anchorFirst = sel.focusOffset > sel.anchorOffset;
-    //     const previousLines = Math.floor((anchorFirst ? sel.anchorOffset : sel.focusOffset) / 2);
-    //     var nodes: Node[] = [];
-    //     inner.childNodes.forEach((node, _i, _list) => {
-    //         nodes.push(node);
-    //     });
-        
-    //     const node = nodes[previousLines];
-    //     const nodeLength = node.textContent.length;
-    //     var range = new Range();
-    //     if (anchorFirst) {
-    //         range.setStart(sel.anchorNode, sel.anchorOffset);
-    //         range.setEnd(node, nodeLength > 0 ? nodeLength - 1: nodeLength);
-    //     } else {
-    //         range.setStart(node, nodeLength > 0 ? nodeLength - 1: nodeLength);
-    //         range.setEnd(sel.focusNode, sel.focusOffset);
-    //     }
-    //     console.log(range);
-    //     sel.removeAllRanges();
-    //     sel.addRange(range);
-    // }
-}
-
 export function processNewline(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
     const sel = window.getSelection();
@@ -68,7 +39,7 @@ export function processTab(event: JQuery.KeyDownEvent): boolean {
     const sel = window.getSelection();
 
     // Todo: complete multiline tab handling
-    if (sel.anchorNode != sel.focusNode) {
+    if (sel.anchorNode != sel.focusNode || sel.anchorNode == $('.inner', '#main-editor')[0]) {
         tabMultiline(event.shiftKey);
     } else if (event.shiftKey) {
         outdent();
@@ -127,10 +98,27 @@ function tabMultiline(outdent: boolean = false) {
         nodes.push(node);
     });
 
+    
+    var selectedNodes: Node[];
     const anchorIndex = nodes.indexOf(sel.anchorNode);
     const focusIndex = nodes.indexOf(sel.focusNode);
-    var selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
+    const validNodes = anchorIndex != -1 && focusIndex != -1;
+    if (validNodes) {
+        selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
                         : nodes.slice(focusIndex, anchorIndex + 1);
+    } else if (anchorIndex == -1 && focusIndex != -1) {
+        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusIndex)
+                        : nodes.slice(focusIndex, anchorOffset + 1);
+    } else if (anchorIndex != -1 && focusIndex == -1) {
+        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorIndex, focusOffset + 1)
+                        : nodes.slice(focusOffset, anchorIndex + 1);
+    } else {
+        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusOffset)
+                        : nodes.slice(focusOffset, anchorOffset);
+    }
+
+    console.log(anchorOffset, focusOffset);
+    console.log(selectedNodes);
     if (selectedNodes.length > 1) {
         var outdented = false;
         selectedNodes.forEach((node, _i, _arr) => {
@@ -156,30 +144,32 @@ function tabMultiline(outdent: boolean = false) {
             }
         });
 
-        var firstRange = new Range();
-        if (focusIndex > anchorIndex) {
-            firstRange.setStart(sel.anchorNode, sel.anchorOffset);
-            if (outdent && outdented) {
-                firstRange.setEnd(sel.focusNode, focusOffset - tabLength);
-            } else if (!outdent) {
-                firstRange.setEnd(sel.focusNode, focusOffset + tabLength);
+        if (validNodes) {
+            var firstRange = new Range();
+            if (focusIndex > anchorIndex) {
+                firstRange.setStart(sel.anchorNode, sel.anchorOffset);
+                if (outdent && outdented) {
+                    firstRange.setEnd(sel.focusNode, focusOffset - tabLength);
+                } else if (!outdent) {
+                    firstRange.setEnd(sel.focusNode, focusOffset + tabLength);
+                }
+            } else {
+                firstRange.setStart(sel.focusNode, sel.focusOffset);
+                if (outdent && outdented) {
+                    firstRange.setEnd(sel.anchorNode, anchorOffset - tabLength);
+                } else if (!outdent) {
+                    firstRange.setEnd(sel.anchorNode, anchorOffset + tabLength);
+                }
             }
-        } else {
-            firstRange.setStart(sel.focusNode, sel.focusOffset);
-            if (outdent && outdented) {
-                firstRange.setEnd(sel.anchorNode, anchorOffset - tabLength);
-            } else if (!outdent) {
-                firstRange.setEnd(sel.anchorNode, anchorOffset + tabLength);
-            }
-        }
 
-        if (outdent && outdented || !outdent) {
-            sel.removeAllRanges();
-            lastRanges.forEach((range, _i, _arr) => {
-                sel.addRange(range);
-            });
-            sel.removeRange(sel.getRangeAt(0));
-            sel.addRange(firstRange);
+            if ((outdent && outdented) || !outdent) {
+                sel.removeAllRanges();
+                lastRanges.forEach((range, _i, _arr) => {
+                    sel.addRange(range);
+                });
+                sel.removeRange(sel.getRangeAt(0));
+                sel.addRange(firstRange);
+            }
         }
     }
 }

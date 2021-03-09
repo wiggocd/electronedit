@@ -52,15 +52,6 @@ function addListeners() {
     $('#main-editor').on('cut paste', (_event) => {
         updateWithTimeout();
     });
-
-    document.addEventListener('selectionchange', (event) => {
-        const sel = window.getSelection();
-        const mainEditor = $('#main-editor')[0];
-        if (sel.anchorNode.parentElement == mainEditor || sel.anchorNode.parentElement.parentElement == mainEditor
-            || sel.focusNode.parentElement == mainEditor || sel.focusNode.parentElement.parentElement == mainEditor) {
-            EditorProcesses.selectionChanged();
-        }
-    });
 }
 
 function undo() {
