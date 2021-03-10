@@ -81,10 +81,11 @@ h2 {
 }
 
 .tab {
-    width: 60px;
+    width: 80px;
     cursor: pointer;
     padding: var(--navbar-lateral-padding);
     box-shadow: none 4px 0.8 1 black;
+    overflow: hidden;
 }
 
 #active-tab {

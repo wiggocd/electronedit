@@ -193,6 +193,22 @@ export function processBackspace(_event: JQuery.KeyDownEvent): boolean {
     return false;
 }
 
+export function undo() {
+    document.execCommand('undo');
+    updateWithTimeout();
+}
+
+export function redo() {
+    document.execCommand('redo');
+    updateWithTimeout();
+}
+
+export function updateWithTimeout() {
+    setTimeout(function() {
+        updateMargin();
+    }, 0);
+}
+
 export function update(file: File) {
     $('.inner', '#main-editor')[0].innerText = file.text;
     $('#tabbar').show();

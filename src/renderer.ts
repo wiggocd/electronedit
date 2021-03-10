@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from 'electron';
 import { AppEvent } from './events';
 import Main from './main';
-import * as EditorProcesses from './editor_proc';
+import * as EditorProcesses from './editorprocesses';
 import $ from 'jquery';
 
 export var currentWindow: Electron.BrowserWindow;
@@ -17,8 +17,8 @@ const ipcMethods = {
     'editorPathUpdate': EditorProcesses.updatePath,
     'editorWrite': EditorProcesses.write,
     'editorClose': EditorProcesses.close,
-    'undo': undo,
-    'redo': redo
+    'undo': EditorProcesses.undo,
+    'redo': EditorProcesses.redo
 };
 
 const keyMethods = {
@@ -42,7 +42,7 @@ function addListeners() {
         if (keyMethods[event.key]) {
             ret = keyMethods[event.key](event);
         } else if (event.metaKey && event.key == 'z') {
-            updateWithTimeout();
+            EditorProcesses.updateWithTimeout();
         }
 
         EditorProcesses.updateMargin();
@@ -50,24 +50,8 @@ function addListeners() {
     });
 
     $('#main-editor').on('cut paste', (_event) => {
-        updateWithTimeout();
+        EditorProcesses.updateWithTimeout();
     });
-}
-
-function undo() {
-    document.execCommand('undo');
-    updateWithTimeout();
-}
-
-function redo() {
-    document.execCommand('redo');
-    updateWithTimeout();
-}
-
-function updateWithTimeout() {
-    setTimeout(function() {
-        EditorProcesses.updateMargin();
-    }, 0);
 }
 
 function createTitlebar() {
