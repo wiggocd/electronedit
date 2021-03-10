@@ -107,11 +107,11 @@ function tabMultiline(outdent: boolean = false) {
         selectedNodes = focusIndex > anchorIndex ? nodes.slice(anchorIndex, focusIndex + 1)
                         : nodes.slice(focusIndex, anchorIndex + 1);
     } else if (anchorIndex == -1 && focusIndex != -1) {
-        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusOffset + 1)
-                        : nodes.slice(focusOffset, anchorOffset + 1);
+        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusIndex + 1)
+                        : nodes.slice(focusIndex, anchorOffset + 1);
     } else if (anchorIndex != -1 && focusIndex == -1) {
-        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusOffset + 1)
-                        : nodes.slice(focusOffset, anchorOffset + 1);
+        selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorIndex, focusOffset + 1)
+                        : nodes.slice(focusOffset, anchorIndex + 1);
     } else {
         selectedNodes = focusOffset > anchorOffset ? nodes.slice(anchorOffset, focusOffset)
                         : nodes.slice(focusOffset, anchorOffset);
