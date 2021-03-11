@@ -119,7 +119,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
                 type: 'normal',
                 accelerator: 'CmdOrCtrl+N',
                 click() {
-                    if (!Editor.file || !Editor.file.path) {
+                    if (!Editor.openFile || !Editor.openFile.path) {
                         Editor.newFile(dialog.showSaveDialogSync(Main.mainWindow));
                     }
                 }
@@ -137,7 +137,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
                 type: 'normal',
                 accelerator: 'CmdOrCtrl+S',
                 click() {
-                    if (!Editor.file.path) {
+                    if (!Editor.openFile.path) {
                         Editor.setPath(dialog.showSaveDialogSync(Main.mainWindow));
                     }
                     Editor.save();
@@ -148,7 +148,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
                 type: 'normal',
                 accelerator: 'CmdOrCtrl+W',
                 click() {
-                    if (Editor.file) {
+                    if (Editor.openFile) {
                         Editor.close()
                     }
                 }

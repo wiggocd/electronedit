@@ -1,6 +1,8 @@
 import { ipcRenderer } from 'electron';
 import { File } from './files';
+import { AppEvent } from './events';
 import $ from 'jquery';
+import Editor from './editor';
 
 const tab = '    ';
 const tabLength = tab.length;
@@ -209,13 +211,17 @@ export function updateWithTimeout() {
     }, 0);
 }
 
-export function update(file: File) {
-    $('.inner', '#main-editor')[0].innerText = file.text;
-    $('#tabbar').show();
-    $('#main-editor').show();
-    $('#editor-welcome').hide();
+export function update(openFile: File, files: File[]) {
+    if (openFile) {
+        $('.inner', '#main-editor')[0].innerText = openFile.text;
+        $('#tabbar').show();
+        $('#main-editor').show();
+        $('#editor-welcome').hide();
+    }
+    
     updateMargin();
-    updatePath(file);
+    updatePath(openFile);
+    updateTabs(openFile, files);
 }
 
 export function updateMargin() {
@@ -232,7 +238,34 @@ export function updateMargin() {
 export function updatePath(file: File) {
     $('#navigationbar').children()[0].innerText = file.path;
     $('#navigationbar').show();
-    $('#active-tab').children()[0].innerText = file.name;
+}
+
+function updateTabs(openFile: File, files: File[]) {
+    const tabbar = $('#tabbar')[0];
+    while (tabbar.lastChild) {
+        tabbar.removeChild(tabbar.lastChild);
+    }
+
+    console.log(openFile);
+
+    files.forEach((file, _i, _arr) => {
+        var tab = document.createElement('div');
+        var span = document.createElement('span');
+        tab.className = 'tab';
+        span.className = 'vertical-center';
+        span.innerText = file.name;
+
+        if (file.path == openFile.path) {
+            tab.id = 'active-tab';
+        }
+
+        tab.addEventListener('click', (_event) => {
+            ipcRenderer.send('editorUpdate', file);
+        });
+
+        tab.appendChild(span);
+        tabbar.appendChild(tab);
+    });
 }
 
 export function write(_file: File) {
@@ -240,13 +273,15 @@ export function write(_file: File) {
     ipcRenderer.send('editorWriteReturn', el.innerText);
 }
 
-export function close(_file: File) {
+export function close(_openFile: File, files: File[]) {
     $('.inner', '#main-editor')[0].innerText = '';
     $('#navigationbar').children()[0].innerText = '';
-    $('#active-tab').children()[0].innerText = '';
+    $('#active-tab')[0].remove();
 
-    $('#main-editor').hide();
-    $('#tabbar').hide();
-    $('#navigationbar').hide();
-    $('#editor-welcome').show();
+    if (files.length == 0) {
+        $('#main-editor').hide();
+        $('#tabbar').hide();
+        $('#navigationbar').hide();
+        $('#editor-welcome').show();
+    }
 }

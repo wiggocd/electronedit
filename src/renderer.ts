@@ -31,7 +31,7 @@ ipcRenderer.on('main', (_event, args) => {
     if (args) {
         const eventObject: AppEvent = args;
         if (ipcMethods[eventObject.eventName]) {
-            ipcMethods[eventObject.eventName](eventObject.data);
+            ipcMethods[eventObject.eventName](...eventObject.data);
         }
     }
 });
