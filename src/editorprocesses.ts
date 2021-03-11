@@ -40,8 +40,7 @@ export function processTab(event: JQuery.KeyDownEvent): boolean {
     event.preventDefault();
     const sel = window.getSelection();
 
-    // Todo: complete multiline tab handling
-    if (sel.anchorNode != sel.focusNode || sel.anchorNode == $('.inner', '#main-editor')[0]) {
+    if (sel.anchorNode != sel.focusNode ||(sel.anchorOffset != sel.focusOffset && sel.anchorNode == $('.inner', '#main-editor')[0])) {
         tabMultiline(event.shiftKey);
     } else if (event.shiftKey) {
         outdent();
@@ -217,6 +216,8 @@ export function update(openFile: File, files: File[]) {
         $('#tabbar').show();
         $('#main-editor').show();
         $('#editor-welcome').hide();
+    } else {
+        close(openFile, files);
     }
     
     updateMargin();
@@ -236,7 +237,7 @@ export function updateMargin() {
 }
 
 export function updatePath(file: File) {
-    $('#navigationbar').children()[0].innerText = file.path;
+    $('#navigationbar').children()[0].innerText = file ? file.path : '';
     $('#navigationbar').show();
 }
 
@@ -246,17 +247,23 @@ function updateTabs(openFile: File, files: File[]) {
         tabbar.removeChild(tabbar.lastChild);
     }
 
-    console.log(openFile);
-
     files.forEach((file, _i, _arr) => {
         var tab = document.createElement('div');
         var span = document.createElement('span');
         tab.className = 'tab';
         span.className = 'vertical-center';
-        span.innerText = file.name;
+        span.innerText = file.basename;
 
         if (file.path == openFile.path) {
             tab.id = 'active-tab';
+            var closeButton = document.createElement('img');
+            closeButton.className = 'close-button';
+            closeButton.src = 'resources/close-button.svg';
+            closeButton.addEventListener('click', (_event) => {
+                ipcRenderer.send('editorClose', file);
+                event.stopPropagation();
+            });
+            span.appendChild(closeButton);
         }
 
         tab.addEventListener('click', (_event) => {
@@ -276,7 +283,10 @@ export function write(_file: File) {
 export function close(_openFile: File, files: File[]) {
     $('.inner', '#main-editor')[0].innerText = '';
     $('#navigationbar').children()[0].innerText = '';
-    $('#active-tab')[0].remove();
+    let activeTab = $('#active-tab')[0];
+    if (activeTab) {
+        activeTab.remove();
+    }
 
     if (files.length == 0) {
         $('#main-editor').hide();

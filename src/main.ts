@@ -149,7 +149,7 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
                 accelerator: 'CmdOrCtrl+W',
                 click() {
                     if (Editor.openFile) {
-                        Editor.close()
+                        Editor.close(Editor.openFile);
                     }
                 }
             },

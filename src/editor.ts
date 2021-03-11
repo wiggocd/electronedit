@@ -16,6 +16,10 @@ export default class Editor {
         ipcMain.on('editorUpdate', (_event, args) => {
             Editor.update(args);
         });
+
+        ipcMain.on('editorClose', (_event, args) => {
+            Editor.close(args);
+        });
     }
 
     static open(paths: string[]) {
@@ -51,22 +55,29 @@ export default class Editor {
         }
     }
 
-    static close() {
+    static close(file: File) {
         var files: File[] = [];
-        Editor.files.forEach((file, _i, _arr) => {
-            if (file.path != Editor.openFile.path) { files.push(file); }
+        Editor.files.forEach((currentFile, _i, _arr) => {
+            if (currentFile.path != file.path) { files.push(currentFile); }
         });
 
         Editor.files = files;
-        Main.mainWindow.webContents.send('main', new AppEvent('editorClose', Editor.openFile, Editor.files));
+        Main.mainWindow.webContents.send('main', new AppEvent('editorClose', file, Editor.files));
         const fileCount = Editor.files.length;
-        if (fileCount > 0) {
-            Editor.openFile = Editor.files[fileCount - 1]
-        } else {
-            Editor.openFile = undefined;
+        if (file.path == Editor.openFile.path) {
+            if (fileCount > 0) {
+                Editor.openFile = Editor.files[fileCount - 1]
+            } else {
+                Editor.openFile = undefined;
+            }
         }
 
-        Main.mainWindow.webContents.send('main', new AppEvent('editorUpdate', Editor.openFile, Editor.files));
+        if (Editor.openFile) {
+            console.log('Update');
+            Main.mainWindow.webContents.send('main', new AppEvent('editorUpdate', Editor.openFile, Editor.files));
+        } else {
+            Main.mainWindow.webContents.send('main', new AppEvent('editorClose', Editor.openFile, Editor.files));
+        }
     }
 
     static setPath(path: string) {

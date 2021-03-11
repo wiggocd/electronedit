@@ -1,5 +1,5 @@
 :root {
-    --mac-titlebar-height: 25px;
+    --mac-titlebar-height: 20px;
     --header-bg: rgba(46, 46, 46, 0.9);
     --navbar-height: 12px;
     --navbar-lateral-padding: 6px;
@@ -94,6 +94,17 @@ h2 {
     background-color: rgb(51, 51, 51);
     color: lightgray;
     border-top: 1px solid rgb(74, 173, 255);
+}
+
+.close-button {
+    width: 15px;
+    height: 15px;
+    float: right;
+    filter: invert(0.8);
+}
+
+.close-button:hover {
+    filter: invert(0.6);
 }
 
 #navigationbar {
