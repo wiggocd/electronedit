@@ -259,7 +259,7 @@ function updateTabs(openFile: File, files: File[]) {
             var closeButton = document.createElement('img');
             closeButton.className = 'close-button';
             closeButton.src = 'resources/close-button.svg';
-            closeButton.addEventListener('click', (_event) => {
+            closeButton.addEventListener('click', (event) => {
                 ipcRenderer.send('editorClose', file);
                 event.stopPropagation();
             });
