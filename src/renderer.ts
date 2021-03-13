@@ -3,6 +3,7 @@ import { AppEvent } from './events';
 import Main from './main';
 import * as EditorProcesses from './editorprocesses';
 import $ from 'jquery';
+import { Titlebar, Color, Themebar } from 'custom-electron-titlebar'
 
 export var currentWindow: Electron.BrowserWindow;
 
@@ -60,7 +61,16 @@ function createTitlebar() {
         $('.editor').each((_index, el) => {
             el.style.height = 'calc(100% - var(--navbar-height) - var(--editor-padding) - var(--mac-titlebar-height) * 2)';
         });
-    } else {
+    
+    } 
+    if (Main.isLinux) {
+
+        new Titlebar({
+            backgroundColor: Color.fromHex('#2e2e2e'),
+            iconsTheme: Themebar.mac
+        });
+    }
+    else {
         require('./customtitlebar');
     }
 }

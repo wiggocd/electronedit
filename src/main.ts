@@ -7,6 +7,7 @@ var appMenu: Electron.MenuItemConstructorOptions;
 
 export default class Main {
     static isMac = process.platform === 'darwin';
+    static isLinux = process.platform === 'linux';
     static isWindows = process.platform == 'win32';
     static mainWindow: Electron.BrowserWindow;
     static application: Electron.App;
@@ -239,10 +240,18 @@ const menuTemplate: Electron.MenuItemConstructorOptions[] = [
         role: 'help',
         submenu: [
             {
-                label: 'Learn More',
+                label: 'Electron Website',
                 click: async () => {
                     const { shell } = require('electron')
                     await shell.openExternal('https://electronjs.org')
+                }
+
+            },
+            {
+                label: 'Electronedit Github',
+                click: async () => {
+                    const { shell } = require('electron')
+                    await shell.openExternal('https://github.com/wiggocd/electronedit/tree/master')
                 }
             }
         ]
