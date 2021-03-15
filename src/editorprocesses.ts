@@ -138,7 +138,7 @@ function tabMultiline(outdent: boolean = false) {
                     node.textContent = node.textContent.substr(tabLength, node.textContent.length);
                     outdented = true;
                 }
-            } else {
+            } else if (node.textContent.indexOf('\n') == -1) {
                 node.textContent = tab + node.textContent;
             }
         });
@@ -221,6 +221,7 @@ export function update(openFile: File, files: File[]) {
     }
     
     updateMargin();
+    updateHighlighting();
     updatePath(openFile);
     updateTabs(openFile, files);
 }
@@ -234,6 +235,13 @@ export function updateMargin() {
     }
 
     $('.margin', '#main-editor')[0].innerText = lines;
+}
+
+function updateHighlighting() {
+    const el = $('.inner', '#main-editor')[0];
+    el.childNodes.forEach((node, _i, _list) => {
+        // console.log(node);
+    });
 }
 
 export function updatePath(file: File) {
